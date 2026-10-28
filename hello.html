@@ -21,7 +21,7 @@
     }
     .card {
       width: 100%;
-      max-width: 460px;
+      max-width: 520px;
       padding: 40px 32px;
       background: rgba(255, 255, 255, 0.92);
       border-radius: 24px;
@@ -30,7 +30,7 @@
     }
     .header {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
     .logo {
       width: 88px;
@@ -44,13 +44,75 @@
       color: #5877f0;
     }
     h1 {
-      margin: 0 0 8px;
+      margin: 0;
       font-size: 1.6rem;
     }
-    .desc {
-      margin: 0;
+    .intro {
+      margin: 0 0 20px;
       font-size: 0.95rem;
-      color: #636e72;
+      line-height: 1.7;
+      color: #4b5457;
+    }
+    .info {
+      margin: 0 0 8px;
+      padding: 16px 18px;
+      background: #f2f6ff;
+      border-radius: 14px;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      padding: 6px 0;
+      font-size: 0.95rem;
+    }
+    dt {
+      flex: 0 0 76px;
+      font-weight: 700;
+      color: #5877f0;
+    }
+    dd {
+      margin: 0;
+      flex: 1;
+    }
+    .place {
+      padding: 0;
+      font: inherit;
+      text-align: left;
+      color: #2d3436;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .place .pin {
+      margin-left: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #5877f0;
+      text-decoration: underline;
+    }
+    .place:focus-visible {
+      outline: 2px solid #6c8cff;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+    .map {
+      margin: 8px 0 24px;
+    }
+    .map iframe {
+      display: block;
+      width: 100%;
+      height: 240px;
+      border: 0;
+      border-radius: 14px;
+    }
+    .map a {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #5877f0;
+    }
+    .spacer {
+      height: 16px;
     }
     .field {
       margin-bottom: 18px;
@@ -80,12 +142,13 @@
       border-color: #6c8cff;
       box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25);
     }
-    button {
+    .submit {
       width: 100%;
       margin-top: 8px;
       padding: 14px;
       font-size: 1.05rem;
       font-weight: 700;
+      font-family: inherit;
       color: #fff;
       background: #6c8cff;
       border: none;
@@ -93,11 +156,11 @@
       cursor: pointer;
       transition: transform 0.15s ease, background 0.15s ease;
     }
-    button:hover {
+    .submit:hover {
       background: #5877f0;
       transform: translateY(-2px);
     }
-    button:active {
+    .submit:active {
       transform: translateY(0);
     }
     @keyframes fadeUp {
@@ -118,8 +181,43 @@
       </svg>
       <p class="company">PM 전자</p>
       <h1>웨비나 참가 신청</h1>
-      <p class="desc">아래 정보를 입력하고 신청 완료 버튼을 눌러 주세요.</p>
     </div>
+
+    <!-- 아래 설명·참가 대상·모집 인원·장소는 예시 정보입니다. 실제 행사 내용으로 교체하세요. -->
+    <p class="intro">
+      PM 전자가 준비한 웨비나에 초대합니다. 이틀 동안 회사 소식과 업계 이야기를 함께 나누고,
+      참가자와 질문과 의견을 주고받는 시간을 갖습니다. 참가를 원하시면 아래 정보를 입력해 신청해 주세요.
+    </p>
+
+    <dl class="info">
+      <div class="row">
+        <dt>일정</dt>
+        <dd>2026년 10월 28일(수) ~ 10월 29일(목)</dd>
+      </div>
+      <div class="row">
+        <dt>장소</dt>
+        <dd>
+          <button type="button" class="place" id="placeBtn" aria-expanded="false" aria-controls="mapBox">
+            서울 코엑스 컨퍼런스룸<span class="pin" id="pinText">📍 지도 보기</span>
+          </button>
+        </dd>
+      </div>
+      <div class="row">
+        <dt>참가 대상</dt>
+        <dd>협력사·고객사 담당자 및 관심 있는 누구나</dd>
+      </div>
+      <div class="row">
+        <dt>모집 인원</dt>
+        <dd>선착순 100명</dd>
+      </div>
+    </dl>
+
+    <div class="map" id="mapBox" hidden>
+      <iframe id="mapFrame" title="행사 장소 지도" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <a href="https://www.google.com/maps/search/?api=1&query=%EC%84%9C%EC%9A%B8%20%EC%BD%94%EC%97%91%EC%8A%A4" target="_blank" rel="noopener">구글 지도에서 크게 보기</a>
+    </div>
+
+    <div class="spacer"></div>
 
     <form id="form">
       <div class="field">
@@ -142,11 +240,28 @@
         <label for="phone">연락처 (선택)</label>
         <input type="tel" id="phone" name="phone" placeholder="010-0000-0000">
       </div>
-      <button type="submit">신청 완료</button>
+      <button type="submit" class="submit">신청 완료</button>
     </form>
   </main>
 
   <script>
+    var placeBtn = document.getElementById("placeBtn");
+    var pinText = document.getElementById("pinText");
+    var mapBox = document.getElementById("mapBox");
+    var mapFrame = document.getElementById("mapFrame");
+    var mapLoaded = false;
+
+    placeBtn.addEventListener("click", function () {
+      var willOpen = mapBox.hidden;
+      if (willOpen && !mapLoaded) {
+        mapFrame.src = "https://maps.google.com/maps?q=" + encodeURIComponent("서울 코엑스") + "&hl=ko&z=16&output=embed";
+        mapLoaded = true;
+      }
+      mapBox.hidden = !willOpen;
+      placeBtn.setAttribute("aria-expanded", String(willOpen));
+      pinText.textContent = willOpen ? "📍 지도 닫기" : "📍 지도 보기";
+    });
+
     var form = document.getElementById("form");
 
     form.addEventListener("submit", function (event) {

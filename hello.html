@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World</title>
+  <title>PM 전자 웨비나 참가 신청</title>
   <style>
     * {
       box-sizing: border-box;
@@ -14,46 +14,78 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 24px 16px;
       font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
       background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 50%, #fbc2eb 100%);
       color: #2d3436;
     }
     .card {
       width: 100%;
-      max-width: 420px;
-      padding: 48px 32px;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.85);
+      max-width: 460px;
+      padding: 40px 32px;
+      background: rgba(255, 255, 255, 0.92);
       border-radius: 24px;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
       animation: fadeUp 0.7s ease both;
     }
-    .wave {
-      display: inline-block;
-      font-size: 3.5rem;
-      transform-origin: 70% 70%;
-      animation: wave 2s ease-in-out infinite;
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .logo {
+      width: 88px;
+      height: 88px;
+    }
+    .company {
+      margin: 12px 0 4px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #5877f0;
     }
     h1 {
-      margin: 16px 0 8px;
-      font-size: 2.2rem;
-    }
-    .greeting {
       margin: 0 0 8px;
-      font-size: 1.1rem;
+      font-size: 1.6rem;
+    }
+    .desc {
+      margin: 0;
+      font-size: 0.95rem;
       color: #636e72;
     }
-    .message {
-      min-height: 1.6em;
-      margin: 0 0 28px;
+    .field {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .required {
+      color: #e84118;
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
       font-size: 1rem;
-      color: #636e72;
+      font-family: inherit;
+      color: #2d3436;
+      background: #fff;
+      border: 1px solid #d5dbe3;
+      border-radius: 10px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input:focus {
+      outline: none;
+      border-color: #6c8cff;
+      box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25);
     }
     button {
-      padding: 12px 28px;
-      font-size: 1rem;
-      font-weight: 600;
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
       color: #fff;
       background: #6c8cff;
       border: none;
@@ -72,42 +104,65 @@
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    @keyframes wave {
-      0%, 60%, 100% { transform: rotate(0deg); }
-      10%, 30% { transform: rotate(14deg); }
-      20% { transform: rotate(-8deg); }
-      40% { transform: rotate(-4deg); }
-      50% { transform: rotate(10deg); }
-    }
   </style>
 </head>
 <body>
   <main class="card">
-    <div class="wave">👋</div>
-    <h1>Hello, World!</h1>
-    <p class="greeting" id="greeting"></p>
-    <p class="message" id="message">첫 번째 웹페이지를 만나 주셔서 반갑습니다.</p>
-    <button id="btn">인사 받기</button>
+    <div class="header">
+      <svg class="logo" viewBox="0 0 120 120" role="img" aria-label="웨비나 아이콘">
+        <rect width="120" height="120" rx="28" fill="#6c8cff"/>
+        <rect x="24" y="30" width="72" height="48" rx="8" fill="#ffffff"/>
+        <polygon points="54,44 54,64 72,54" fill="#6c8cff"/>
+        <rect x="54" y="78" width="12" height="10" fill="#ffffff"/>
+        <rect x="42" y="88" width="36" height="6" rx="3" fill="#ffffff"/>
+      </svg>
+      <p class="company">PM 전자</p>
+      <h1>웨비나 참가 신청</h1>
+      <p class="desc">아래 정보를 입력하고 신청 완료 버튼을 눌러 주세요.</p>
+    </div>
+
+    <form id="form">
+      <div class="field">
+        <label for="name">이름 <span class="required">*</span></label>
+        <input type="text" id="name" name="name" placeholder="홍길동" required>
+      </div>
+      <div class="field">
+        <label for="email">이메일 <span class="required">*</span></label>
+        <input type="email" id="email" name="email" placeholder="example@company.com" required>
+      </div>
+      <div class="field">
+        <label for="company">회사명 <span class="required">*</span></label>
+        <input type="text" id="company" name="company" placeholder="회사명" required>
+      </div>
+      <div class="field">
+        <label for="position">직책 <span class="required">*</span></label>
+        <input type="text" id="position" name="position" placeholder="예: 매니저" required>
+      </div>
+      <div class="field">
+        <label for="phone">연락처 (선택)</label>
+        <input type="tel" id="phone" name="phone" placeholder="010-0000-0000">
+      </div>
+      <button type="submit">신청 완료</button>
+    </form>
   </main>
 
   <script>
-    var hour = new Date().getHours();
-    var greeting = "안녕하세요!";
-    if (hour < 12) greeting = "좋은 아침입니다!";
-    else if (hour < 18) greeting = "좋은 오후입니다!";
-    else greeting = "좋은 저녁입니다!";
-    document.getElementById("greeting").textContent = greeting;
+    var form = document.getElementById("form");
 
-    var messages = [
-      "오늘도 한 걸음씩 만들어 가고 계시네요.",
-      "작게 시작해도 충분히 멋진 출발입니다.",
-      "버튼을 눌러 주셔서 감사합니다!",
-      "코드는 쓰는 만큼 익숙해집니다."
-    ];
-    var index = 0;
-    document.getElementById("btn").addEventListener("click", function () {
-      document.getElementById("message").textContent = messages[index];
-      index = (index + 1) % messages.length;
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      var phone = document.getElementById("phone").value.trim();
+      var message =
+        "웨비나 참가 신청이 완료되었습니다.\n\n" +
+        "이름: " + document.getElementById("name").value.trim() + "\n" +
+        "이메일: " + document.getElementById("email").value.trim() + "\n" +
+        "회사명: " + document.getElementById("company").value.trim() + "\n" +
+        "직책: " + document.getElementById("position").value.trim() + "\n" +
+        "연락처: " + (phone || "(입력 안 함)");
+
+      alert(message);
+      form.reset();
     });
   </script>
 </body>

@@ -1,14 +1,13 @@
 # helloworld.test
 
 <p align="center">
-  <strong>AI 프로덕트 매니저</strong> · <strong>DJlee</strong>
+  <strong>AI 프로덕트 매니저</strong> · 
 </p>
 
 ---
 
 ## 소개
 
-- 이름: DJlee
 - 과정: AI 프로덕트 매니저 (2026.10 ~ 2027.04)
 - 목표: 사용자 문제를 이해하고, 데이터를 기반으로 서비스를 설계하며, AI를 활용해 실제 가치를 만드는 사람
 - 관심 분야: 서비스 기획, 유저 여정, 데이터 기반 의사결정, AI 서비스 설계, 제품 실험

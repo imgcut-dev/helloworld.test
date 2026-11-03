@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>내 판매 목록 화면</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#FFFFFF;color:#1F2328;font-family:'Noto Sans KR',system-ui,sans-serif;font-size:15px;line-height:1.5;box-sizing:border-box">
+  <header style="height:56px;flex:none;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #E3E6EA">
+    <div style="font-weight:700;font-size:18px">내 판매 목록</div>
+  </header>
+  <div style="flex:none;display:flex;gap:8px;padding:12px 16px">
+    <span style="padding:6px 14px;border-radius:16px;background:#1F2328;color:#FFFFFF;font-size:14px;font-weight:500">판매중</span>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow:hidden">
+    <sc-if value="{{isHas}}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column">
+      <div style="display:flex;gap:12px;padding:16px;border-top:1px solid #EEF0F2">
+        <div style="flex:none;width:88px;height:88px;border-radius:8px;background:#E5E7EB;color:#5B6470;display:flex;align-items:center;justify-content:center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:2px">
+          <div style="display:flex;align-items:center;gap:6px"><span style="padding:1px 8px;border-radius:4px;background:#FFF1E6;color:#7C2D12;font-size:12px;font-weight:700">판매중</span><span style="font-size:12px;color:#5B6470">방금 전</span></div>
+          <div style="font-size:16px;font-weight:500">{{titleText}}</div>
+          <div style="font-size:16px;font-weight:700;margin-top:2px">{{priceText}}</div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{isMissing}}" hint-placeholder-val="{{ false }}">
+    <div style="padding:100px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg>
+      <div style="font-weight:700;font-size:17px">방금 등록한 글이 아직 보이지 않아요</div>
+      <div style="color:#5B6470;font-size:14px">등록은 완료됐어요. 목록을 새로고침하면 확인할 수 있어요.</div>
+      <button onClick="{{ hRefresh }}" style="margin-top:8px;min-height:44px;padding:0 20px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 5v5h-5M4 19v-5h5"></path><path d="M5.5 9A7 7 0 0118 7.5L20 10M18.5 15A7 7 0 016 16.5L4 14"></path></svg>
+        새로고침
+      </button>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{isEmpty}}" hint-placeholder-val="{{ false }}">
+    <div style="padding:120px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px">
+      <div style="font-weight:700;font-size:17px">아직 등록한 글이 없어요</div>
+      <div style="color:#5B6470;font-size:14px">홈에서 글쓰기를 눌러 첫 물건을 등록해 보세요.</div>
+    </div>
+    </sc-if>
+  </div>
+
+  <nav style="flex:none;height:64px;display:flex;border-top:1px solid #E3E6EA;background:#FFFFFF">
+    <button onClick="{{ hTabHome }}" style="flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:500;color:#5B6470">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg>홈
+    </button>
+    <button style="flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:700;color:{{accent}}">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"></path></svg>내 판매 목록
+    </button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#C2410C"},"mode":{"editor":null,"default":"has"},"titleText":{"editor":null,"default":"접이식 캠핑 의자"},"priceText":{"editor":null,"default":"15,000원"},"onNav":{"editor":null,"tsType":"(key: string) => void"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const mode = p.mode === undefined || p.mode === null ? 'has' : p.mode;
+    return {
+      accent: p.accent ?? '#C2410C',
+      isHas: mode === 'has',
+      isMissing: mode === 'missing',
+      isEmpty: mode === 'empty',
+      hRefresh: () => { if (typeof p.onNav === 'function') p.onNav('refresh'); },
+      hTabHome: () => { if (typeof p.onNav === 'function') p.onNav('tabHome'); },
+      titleText: p.titleText ?? '접이식 캠핑 의자',
+      priceText: p.priceText ?? '15,000원'
+    };
+  }
+}
+</script>
+</body>
+</html>

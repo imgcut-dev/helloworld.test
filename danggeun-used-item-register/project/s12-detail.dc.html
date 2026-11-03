@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>12 게시글 상세</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#FFFFFF;color:#1F2328;font-family:'Noto Sans KR',system-ui,sans-serif;font-size:15px;line-height:1.5;box-sizing:border-box">
+  <header style="height:56px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px;border-bottom:1px solid #E3E6EA">
+    <button aria-label="홈으로" style="width:48px;height:48px;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#1F2328">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </button>
+    <div style="font-weight:700;font-size:18px">게시글</div>
+  </header>
+
+  <div style="flex:1;min-height:0;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#FFF1E6;color:#7C2D12;font-size:14px;font-weight:500">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>
+      등록이 완료됐어요
+    </div>
+    <div style="height:240px;background:#E5E7EB;color:#5B6470;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:14px">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>
+      <span>사진 2장</span>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5B6470"><span style="padding:2px 8px;border-radius:4px;background:#F5F6F8;color:#1F2328;font-weight:500">내가 쓴 글</span><span>우리 동네</span></div>
+      <div style="font-size:20px;font-weight:700">접이식 캠핑 의자</div>
+      <div style="font-size:13px;color:#5B6470">생활/주방 · 방금 전</div>
+      <div style="font-size:15px">작년 여름에 두 번 사용했어요. 접힘 상태 양호하고 수납 가방 포함입니다. 직거래 선호해요.</div>
+    </div>
+  </div>
+
+  <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid #E3E6EA;background:#FFFFFF">
+    <div style="font-size:18px;font-weight:700">15,000원</div>
+    <button style="height:48px;padding:0 20px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:15px;font-weight:700">내 판매 목록 보기</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#C2410C"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return { accent: this.props.accent ?? '#C2410C' }; }
+}
+</script>
+</body>
+</html>

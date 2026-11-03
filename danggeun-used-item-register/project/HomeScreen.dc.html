@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>홈 화면</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#FFFFFF;color:#1F2328;font-family:'Noto Sans KR',system-ui,sans-serif;font-size:15px;line-height:1.5;box-sizing:border-box">
+  <header style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #E3E6EA">
+    <div style="display:flex;align-items:center;gap:4px;font-weight:700;font-size:18px">
+      <span>우리 동네</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+    </div>
+    <span style="font-size:13px;color:#5B6470">동네 인증 완료</span>
+  </header>
+
+  <div style="flex:1;min-height:0;overflow:hidden">
+    <sc-if value="{{isLoading}}" hint-placeholder-val="{{ false }}">
+    <div style="padding:16px;display:flex;flex-direction:column;gap:16px" aria-label="동네 피드를 불러오는 중">
+      <sc-for list="{{skeletons}}" as="k" hint-placeholder-count="5">
+      <div style="display:flex;gap:12px"><div style="width:88px;height:88px;border-radius:8px;background:#E5E7EB"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;padding-top:6px"><div style="height:16px;width:{{k.w}};background:#E5E7EB;border-radius:4px"></div><div style="height:12px;width:40%;background:#E5E7EB;border-radius:4px"></div><div style="height:16px;width:30%;background:#E5E7EB;border-radius:4px"></div></div></div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{isError}}" hint-placeholder-val="{{ false }}">
+    <div style="padding:120px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg>
+      <div style="font-weight:700;font-size:17px">동네 소식을 불러오지 못했어요</div>
+      <div style="color:#5B6470;font-size:14px">네트워크 연결을 확인한 뒤 다시 시도해 주세요.</div>
+      <button onClick="{{ hRetry }}" style="margin-top:8px;min-height:44px;padding:0 20px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;color:#1F2328;font-size:15px;font-weight:500">다시 시도</button>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{isFeed}}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column">
+      <sc-for list="{{feed}}" as="f" hint-placeholder-count="4">
+      <div style="display:flex;gap:12px;padding:16px;border-bottom:1px solid #EEF0F2">
+        <div style="flex:none;width:88px;height:88px;border-radius:8px;background:#E5E7EB;display:flex;align-items:center;justify-content:center;color:#5B6470">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:2px">
+          <div style="font-size:16px;font-weight:500">{{f.title}}</div>
+          <div style="font-size:13px;color:#5B6470">우리 동네</div>
+          <div style="font-size:16px;font-weight:700;margin-top:4px">{{f.price}}</div>
+        </div>
+      </div>
+      </sc-for>
+    </div>
+    </sc-if>
+  </div>
+
+  <button onClick="{{ hFab }}" aria-label="글쓰기" style="position:absolute;right:16px;bottom:80px;height:52px;padding:0 20px 0 16px;border-radius:26px;border:none;background:{{accent}};color:#FFFFFF;font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,.2)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    글쓰기
+  </button>
+
+  <nav style="flex:none;height:64px;display:flex;border-top:1px solid #E3E6EA;background:#FFFFFF">
+    <button onClick="{{ hTabHome }}" style="flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:700;color:{{accent}}">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg>홈
+    </button>
+    <button onClick="{{ hTabMine }}" style="flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:500;color:#5B6470">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"></path></svg>내 판매 목록
+    </button>
+  </nav>
+
+  <sc-if value="{{isSplash}}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:40;background:#FFFFFF;display:flex;align-items:center;justify-content:center">
+    <img src="/_blob/5ebfd5662602b12f8f47e44fdc25a072" alt="당근마켓" style="height:168px;width:auto">
+  </div>
+  </sc-if>
+
+  <sc-if value="{{hasSession}}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:24px;box-sizing:border-box">
+    <div role="alertdialog" aria-label="다시 로그인해 주세요" style="width:100%;background:#FFFFFF;border-radius:16px;padding:24px 20px 16px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-weight:700;font-size:18px">다시 로그인해 주세요</div>
+      <div style="font-size:15px;color:#3F4752">로그인 정보가 만료되었거나 이용이 제한된 계정이에요. 로그인한 뒤 글을 쓸 수 있어요.</div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button onClick="{{ hDlgClose }}" style="flex:1;height:48px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;color:#1F2328;font-size:15px;font-weight:500">닫기</button>
+        <button onClick="{{ hDlgPrimary }}" style="flex:1;height:48px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:15px;font-weight:700">로그인하기</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#C2410C"},"mode":{"editor":null,"default":"feed"},"overlay":{"editor":null,"default":"none"},"onNav":{"editor":null,"tsType":"(key: string) => void"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const mode = p.mode === undefined || p.mode === null ? 'feed' : p.mode;
+    const overlay = p.overlay === undefined || p.overlay === null ? 'none' : p.overlay;
+    const mk = (k) => () => { if (typeof p.onNav === 'function') p.onNav(k); };
+    return {
+      accent: p.accent ?? '#C2410C',
+      isLoading: mode === 'loading',
+      isSplash: mode === 'splash',
+      isError: mode === 'error',
+      isFeed: mode === 'feed',
+      hasSession: overlay === 'session',
+      hRetry: mk('retry'),
+      hFab: mk('fab'),
+      hTabHome: mk('tabHome'),
+      hTabMine: mk('tabMine'),
+      hDlgClose: mk('dlgClose'),
+      hDlgPrimary: mk('dlgPrimary'),
+      skeletons: [{ w: '70%' }, { w: '55%' }, { w: '75%' }, { w: '60%' }, { w: '65%' }],
+      feed: [
+        { title: '접이식 캠핑 의자', price: '15,000원' },
+        { title: '무선 청소기', price: '80,000원' },
+        { title: '원목 책상 스툴', price: '20,000원' },
+        { title: '아기 보행기', price: '10,000원' },
+        { title: '전기 주전자', price: '12,000원' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "HomeScreen.dc.html": {
+      "h": 844,
+      "title": "dg_2_1 홈 화면 (공용)",
+      "w": 390,
+      "x": 0,
+      "y": 4032
+    },
+    "ListScreen.dc.html": {
+      "h": 844,
+      "title": "dg_5_1 목록 화면 (공용)",
+      "w": 390,
+      "x": 940,
+      "y": 4032
+    },
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 980,
+      "expand": "fill",
+      "is_interactive": true,
+      "title": "프로토타입 (화면 목록 + 화면 이동)"
+    },
+    "WriteScreen.dc.html": {
+      "h": 844,
+      "title": "dg_3 내 물건 팔기 (공용)",
+      "w": 390,
+      "x": 470,
+      "y": 4032
+    },
+    "e10-1-blocked.dc.html": {
+      "h": 844,
+      "title": "dg_3_3_5 등록 차단 안내",
+      "w": 390,
+      "x": 3290,
+      "y": 2788
+    },
+    "e11-1-save-fail.dc.html": {
+      "h": 844,
+      "title": "dg_3_3_8 저장 실패 팝업·재시도",
+      "w": 390,
+      "x": 3760,
+      "y": 2788
+    },
+    "e12-1-no-redirect.dc.html": {
+      "h": 844,
+      "title": "dg_4_1_5 상세 이동 실패 안내",
+      "w": 390,
+      "x": 4230,
+      "y": 2788
+    },
+    "e13-1-list-missing.dc.html": {
+      "h": 844,
+      "title": "dg_5_1_4 목록 미노출 안내·새로고침",
+      "w": 390,
+      "x": 4700,
+      "y": 2788
+    },
+    "e2-1-home-error.dc.html": {
+      "h": 844,
+      "title": "dg_2_1_4 홈 로딩 오류 안내",
+      "w": 390,
+      "x": 0,
+      "y": 2788
+    },
+    "e3-1-session.dc.html": {
+      "h": 844,
+      "title": "dg_1_3_1 로그인 만료 안내 팝업",
+      "w": 390,
+      "x": 470,
+      "y": 2788
+    },
+    "e4-1-permission.dc.html": {
+      "h": 844,
+      "title": "dg_3_1_8 사진·카메라 접근 권한 팝업",
+      "w": 390,
+      "x": 940,
+      "y": 2788
+    },
+    "e5-1-photo-format.dc.html": {
+      "h": 844,
+      "title": "dg_3_1_7 사진 첨부 오류 안내",
+      "w": 390,
+      "x": 1410,
+      "y": 2788
+    },
+    "e6-1-title-empty.dc.html": {
+      "h": 844,
+      "title": "dg_3_2_5_1 제목 오류",
+      "w": 390,
+      "x": 1880,
+      "y": 2788
+    },
+    "e8-1-price-invalid.dc.html": {
+      "h": 844,
+      "title": "dg_3_2_5_3 가격 오류",
+      "w": 390,
+      "x": 2350,
+      "y": 2788
+    },
+    "e9-1-duplicate.dc.html": {
+      "h": 844,
+      "title": "dg_3_3_2 중복 클릭 방지·안내",
+      "w": 390,
+      "x": 2820,
+      "y": 2788
+    },
+    "s01-home-launch.dc.html": {
+      "h": 844,
+      "title": "dg_1_1_1 앱 스플래시",
+      "w": 390,
+      "x": 0,
+      "y": 1544
+    },
+    "s02-home-feed.dc.html": {
+      "h": 844,
+      "title": "dg_2_1_2 동네 피드 목록",
+      "w": 390,
+      "x": 470,
+      "y": 1544
+    },
+    "s03-write-open.dc.html": {
+      "h": 844,
+      "title": "dg_3 내 물건 팔기",
+      "w": 390,
+      "x": 940,
+      "y": 1544
+    },
+    "s04-photo-sheet.dc.html": {
+      "h": 844,
+      "title": "dg_3_1_2 사진 선택 시트 (카메라·앨범)",
+      "w": 390,
+      "x": 1410,
+      "y": 1544
+    },
+    "s05-photo-preview.dc.html": {
+      "h": 844,
+      "title": "dg_3_1_6 사진 미리보기·삭제",
+      "w": 390,
+      "x": 1880,
+      "y": 1544
+    },
+    "s06-title.dc.html": {
+      "h": 844,
+      "title": "dg_3_2_1 제목 입력",
+      "w": 390,
+      "x": 2350,
+      "y": 1544
+    },
+    "s07a-category-sheet.dc.html": {
+      "h": 844,
+      "title": "dg_3_2_2 카테고리 선택 시트",
+      "w": 390,
+      "x": 2820,
+      "y": 1544
+    },
+    "s07b-category-desc.dc.html": {
+      "h": 844,
+      "title": "dg_3_2_3 상세 설명 입력 (선택)",
+      "w": 390,
+      "x": 3290,
+      "y": 1544
+    },
+    "s08-price.dc.html": {
+      "h": 844,
+      "title": "dg_3_2_4 가격 입력",
+      "w": 390,
+      "x": 3760,
+      "y": 1544
+    },
+    "s09-submit-press.dc.html": {
+      "h": 844,
+      "title": "dg_3_3_1 작성 완료 버튼",
+      "w": 390,
+      "x": 4230,
+      "y": 1544
+    },
+    "s10-validating.dc.html": {
+      "h": 844,
+      "title": "dg_3_3_3 필수 항목 검증",
+      "w": 390,
+      "x": 4700,
+      "y": 1544
+    },
+    "s11-saving.dc.html": {
+      "h": 844,
+      "title": "dg_3_3_7 저장 처리",
+      "w": 390,
+      "x": 5170,
+      "y": 1544
+    },
+    "s12-detail.dc.html": {
+      "h": 844,
+      "title": "dg_4_1 상세 화면",
+      "w": 390,
+      "x": 5640,
+      "y": 1544
+    },
+    "s13-mylist.dc.html": {
+      "h": 844,
+      "title": "dg_5_1 목록 화면",
+      "w": 390,
+      "x": 6110,
+      "y": 1544
+    },
+    "DetailScreen.dc.html": {
+      "x": 1410,
+      "y": 4032,
+      "w": 390,
+      "h": 844,
+      "title": "dg_4_1 상세 화면 (공용)"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-11-03T00:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "guide": {
+      "fill": "orange",
+      "text": "이 캔버스 보는 법\n\n왼쪽 위 큰 화면: 화면 목록을 고르면 오른쪽에 해당 화면이 나오고, 화면 안 버튼을 누르면 다음 화면으로 이동하는 프로토타입 (전체 화면으로 열어 보세요)\n\n아래 첫 줄: 성공 시나리오 1~13 화면을 단계 순서대로 펼친 보드\n아래 둘째 줄: 실패 케이스(예외 케이스) 11개 화면\n맨 아래: 여러 보드가 함께 쓰는 공용 화면 (수정하면 같은 화면을 쓰는 보드 전체에 반영)",
+      "w": 420,
+      "x": 1520,
+      "y": 0
+    },
+    "t1": {
+      "kind": "title1",
+      "maxW": 6500,
+      "text": "성공 시나리오 1~13",
+      "w": 240,
+      "x": 0,
+      "y": 1244
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 5090,
+      "text": "실패 케이스 (예외 케이스)",
+      "w": 240,
+      "x": 0,
+      "y": 2488
+    },
+    "t3": {
+      "kind": "title1",
+      "maxW": 1800,
+      "text": "공용 화면 (수정하면 연결된 보드 전체에 반영)",
+      "w": 240,
+      "x": 0,
+      "y": 3732
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "s01-home-launch.dc.html",
+    "s02-home-feed.dc.html",
+    "s03-write-open.dc.html",
+    "s04-photo-sheet.dc.html",
+    "s05-photo-preview.dc.html",
+    "s06-title.dc.html",
+    "s07a-category-sheet.dc.html",
+    "s07b-category-desc.dc.html",
+    "s08-price.dc.html",
+    "s09-submit-press.dc.html",
+    "s10-validating.dc.html",
+    "s11-saving.dc.html",
+    "s12-detail.dc.html",
+    "s13-mylist.dc.html",
+    "e2-1-home-error.dc.html",
+    "e3-1-session.dc.html",
+    "e4-1-permission.dc.html",
+    "e5-1-photo-format.dc.html",
+    "e6-1-title-empty.dc.html",
+    "e8-1-price-invalid.dc.html",
+    "e9-1-duplicate.dc.html",
+    "e10-1-blocked.dc.html",
+    "e11-1-save-fail.dc.html",
+    "e12-1-no-redirect.dc.html",
+    "e13-1-list-missing.dc.html",
+    "HomeScreen.dc.html",
+    "WriteScreen.dc.html",
+    "ListScreen.dc.html",
+    "DetailScreen.dc.html"
+  ],
+  "pages": [],
+  "title": "당근마켓_중고물품 등록_화면목록"
+}

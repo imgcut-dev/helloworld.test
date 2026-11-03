@@ -1,0 +1,1097 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>중고 물품 등록 프로토타입</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+button{font-family:inherit;cursor:pointer}
+select,input,textarea{font-family:inherit;font-size:15px;color:#1F2328}
+input::placeholder,textarea::placeholder{color:#6B7280}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #1F2328;outline-offset:2px}
+@keyframes dcspin{to{transform:rotate(360deg)}}
+.spin{animation:dcspin .8s linear infinite}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.lbl{font-weight:700}
+.err{display:flex;gap:6px;align-items:center;color:#B42318;font-size:13px}
+.tab{flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px}
+.sheetbtn{height:56px;border:none;background:#F5F6F8;border-radius:8px;display:flex;align-items:center;gap:12px;padding:0 16px;font-size:16px;color:#1F2328;text-align:left;width:100%;box-sizing:border-box}
+.setlbl{font-size:13px;font-weight:700}
+.setsel{width:100%;height:44px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;padding:0 8px}
+.setbar > div{max-width:none}
+</style>
+</helmet>
+<div style="display:flex;flex-wrap:wrap;min-height:100vh;background:#EEF0F3;color:#1F2328;font-family:'Noto Sans KR',system-ui,sans-serif;font-size:14px;line-height:1.5">
+
+  <!-- ================= 왼쪽: 화면 목록 ================= -->
+  <aside style="flex:1 1 300px;max-width:360px;background:#FFFFFF;border-right:1px solid #DDE1E6;padding:20px 12px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:2px">
+    <div style="padding:0 8px 12px">
+      <div style="font-size:12px;font-weight:700;color:#5B6470">서비스 · 당근마켓 / 사용자 · 중고 물품 판매자</div>
+      <div style="font-size:18px;font-weight:700;margin-top:2px">중고 물품 등록 화면 목록</div>
+    </div>
+    <div style="padding:0 8px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+      <button onClick="{{ toggleAll }}" aria-pressed="{{ viewAllAria }}" style="width:100%;box-sizing:border-box;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;color:#1F2328;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;text-align:left">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+        {{allLabel}}
+      </button>
+      <button onClick="{{ toggleSettings }}" aria-haspopup="dialog" style="width:100%;box-sizing:border-box;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;color:#1F2328;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;text-align:left">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"></path><circle cx="16" cy="6" r="2"></circle><circle cx="8" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>
+        테스트 설정
+      </button>
+      </div>
+
+    </div>
+    <nav aria-label="화면 목록" style="display:flex;flex-direction:column;gap:2px">
+      <div style="padding:8px 8px 4px;font-size:12px;font-weight:700;color:#5B6470">성공 시나리오</div>
+      <sc-for list="{{successList}}" as="s" hint-placeholder-count="14">
+      <button onClick="{{ s.pick }}" aria-current="{{ s.current }}" style="min-height:44px;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:6px 8px;border:none;border-radius:8px;background:{{s.bg}};color:{{s.fg}};text-align:left;font-size:14px;font-weight:{{s.weight}}">
+        <span style="flex:none;min-width:34px;box-sizing:border-box;padding:2px 6px;border-radius:6px;background:{{s.badgeBg}};color:{{s.badgeFg}};font-size:12px;font-weight:700;text-align:center">{{s.badge}}</span>
+        <span>{{s.label}}</span>
+      </button>
+      </sc-for>
+      <div style="padding:16px 8px 4px;font-size:12px;font-weight:700;color:#5B6470">실패 케이스 (예외 케이스)</div>
+      <sc-for list="{{failList}}" as="s" hint-placeholder-count="11">
+      <button onClick="{{ s.pick }}" aria-current="{{ s.current }}" style="min-height:44px;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:6px 8px;border:none;border-radius:8px;background:{{s.bg}};color:{{s.fg}};text-align:left;font-size:14px;font-weight:{{s.weight}}">
+        <span style="flex:none;min-width:34px;box-sizing:border-box;padding:2px 6px;border-radius:6px;background:{{s.badgeBg}};color:{{s.badgeFg}};font-size:12px;font-weight:700;text-align:center">{{s.badge}}</span>
+        <span>{{s.label}}</span>
+      </button>
+      </sc-for>
+    </nav>
+  </aside>
+
+  <!-- ================= 오른쪽: 도구줄 + 화면 ================= -->
+  <main style="flex:999 1 480px;min-width:0;padding:12px 24px 24px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:12px">
+
+    <!-- 상단 도구줄: 현재 단계 + 테스트 설정 버튼 -->
+    <div style="width:100%;max-width:980px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;position:relative">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0">
+        <sc-if value="{{showBadge}}" hint-placeholder-val="{{ true }}"><span style="padding:2px 8px;border-radius:6px;background:{{cur.badgeBg}};color:{{cur.badgeFg}};font-size:13px;font-weight:700">{{cur.badge}}</span></sc-if>
+        <span style="font-size:18px;font-weight:700">{{toolbarTitle}}</span>
+      </div>
+    </div>
+
+    <!-- 휴대폰 + 오른쪽 설명 열 -->
+    <sc-if value="{{isSingle}}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-start;max-width:100%">
+
+      <!-- ===== 폰 화면 ===== -->
+      <div style="max-width:100%;overflow-x:auto;padding:4px">
+      <div style="width:390px;height:844px;flex:none;position:relative;border-radius:28px;overflow:hidden;background:#FFFFFF;box-shadow:0 0 0 1px #C9CED6,0 12px 32px rgba(0,0,0,.14);display:flex;flex-direction:column;color:#1F2328;font-size:15px;line-height:1.5">
+        <!-- 스플래시 -->
+        <sc-if value="{{isSplash}}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;background:#FFFFFF;display:flex;align-items:center;justify-content:center">
+          <img src="/_blob/5ebfd5662602b12f8f47e44fdc25a072" alt="당근마켓" style="height:168px;width:auto">
+        </div>
+        </sc-if>
+
+        <!-- 홈 -->
+        <sc-if value="{{isHome}}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column;position:relative">
+          <header style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #E3E6EA">
+            <div style="display:flex;align-items:center;gap:4px;font-weight:700;font-size:18px"><span>우리 동네</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></div>
+            <span style="font-size:13px;color:#5B6470">동네 인증 완료</span>
+          </header>
+          <div style="flex:1;min-height:0;overflow-y:auto">
+            <sc-if value="{{homeLoading}}" hint-placeholder-val="{{ false }}">
+            <div style="padding:16px;display:flex;flex-direction:column;gap:16px" aria-label="동네 피드를 불러오는 중">
+              <sc-for list="{{skeletons}}" as="k" hint-placeholder-count="5">
+              <div style="display:flex;gap:12px"><div style="width:88px;height:88px;border-radius:8px;background:#E5E7EB"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;padding-top:6px"><div style="height:16px;width:{{k.w}};background:#E5E7EB;border-radius:4px"></div><div style="height:12px;width:40%;background:#E5E7EB;border-radius:4px"></div><div style="height:16px;width:30%;background:#E5E7EB;border-radius:4px"></div></div></div>
+              </sc-for>
+            </div>
+            </sc-if>
+            <sc-if value="{{homeError}}" hint-placeholder-val="{{ false }}">
+            <div style="padding:120px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg>
+              <div style="font-weight:700;font-size:17px">동네 소식을 불러오지 못했어요</div>
+              <div style="color:#5B6470;font-size:14px">네트워크 연결을 확인한 뒤 다시 시도해 주세요.</div>
+              <button onClick="{{ retryHome }}" style="margin-top:8px;min-height:44px;padding:0 20px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;color:#1F2328;font-size:15px;font-weight:500">다시 시도</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{homeReady}}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{feed}}" as="f" hint-placeholder-count="5">
+              <div style="display:flex;gap:12px;padding:16px;border-bottom:1px solid #EEF0F2">
+                <div style="flex:none;width:88px;height:88px;border-radius:8px;background:#E5E7EB;display:flex;align-items:center;justify-content:center;color:#5B6470">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:2px">
+                  <div style="font-size:16px;font-weight:500">{{f.title}}</div>
+                  <div style="font-size:13px;color:#5B6470">우리 동네</div>
+                  <div style="font-size:16px;font-weight:700;margin-top:4px">{{f.price}}</div>
+                </div>
+              </div>
+              </sc-for>
+            </div>
+            </sc-if>
+          </div>
+          <button onClick="{{ openWrite }}" aria-label="글쓰기" style="position:absolute;right:16px;bottom:80px;height:52px;padding:0 20px 0 16px;border-radius:26px;border:none;background:{{accent}};color:#FFFFFF;font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,.2)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>글쓰기
+          </button>
+          <nav style="flex:none;height:64px;display:flex;border-top:1px solid #E3E6EA;background:#FFFFFF">
+            <button class="tab" onClick="{{ goHome }}" style="font-weight:700;color:{{accent}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg>홈</button>
+            <button class="tab" onClick="{{ goMine }}" style="font-weight:500;color:#5B6470"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"></path></svg>내 판매 목록</button>
+          </nav>
+        </div>
+        </sc-if>
+
+        <!-- 로그인 -->
+        <sc-if value="{{isLogin}}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <header style="height:56px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px;border-bottom:1px solid #E3E6EA">
+            <button onClick="{{ goHome }}" aria-label="뒤로" style="width:48px;height:48px;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#1F2328"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+            <div style="font-weight:700;font-size:18px">로그인</div>
+          </header>
+          <div style="flex:1;padding:32px 16px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:20px;font-weight:700">다시 로그인해 주세요</div>
+            <div style="color:#5B6470;font-size:14px">로그인 정보가 만료되었어요. 전화번호를 입력하면 이어서 글을 쓸 수 있어요.</div>
+            <label for="login-phone" class="lbl" style="margin-top:12px">전화번호</label>
+            <input id="login-phone" type="text" inputmode="numeric" value="{{phone}}" onChange="{{ onPhone }}" placeholder="전화번호를 입력해 주세요" style="height:48px;box-sizing:border-box;padding:0 12px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF">
+          </div>
+          <div style="flex:none;padding:12px 16px;border-top:1px solid #E3E6EA">
+            <button onClick="{{ doLogin }}" style="width:100%;height:52px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:17px;font-weight:700">로그인</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- 카메라 -->
+        <sc-if value="{{isCamera}}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;background:#111111;color:#FFFFFF;display:flex;flex-direction:column">
+          <div style="height:56px;flex:none;display:flex;align-items:center;padding:0 4px">
+            <button onClick="{{ closeCamera }}" aria-label="닫기" style="width:48px;height:48px;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#FFFFFF"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+            <div style="font-weight:700;font-size:17px;margin-left:4px">카메라</div>
+          </div>
+          <div style="flex:1;margin:8px 16px;border:1px dashed #8A94A0;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;color:#D0D5DB;font-size:14px;padding:16px">카메라 화면 (시안)<br>촬영하면 사진이 첨부돼요.</div>
+          <div style="flex:none;height:140px;display:flex;align-items:center;justify-content:center">
+            <button onClick="{{ shutter }}" aria-label="사진 촬영" style="width:76px;height:76px;border-radius:38px;border:4px solid #FFFFFF;background:#111111;padding:0;display:flex;align-items:center;justify-content:center"><span style="width:56px;height:56px;border-radius:28px;background:#FFFFFF"></span></button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- 내 물건 팔기 -->
+        <sc-if value="{{isWrite}}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <header style="height:56px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px;border-bottom:1px solid #E3E6EA">
+            <button onClick="{{ goHome }}" aria-label="뒤로" style="width:48px;height:48px;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#1F2328"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+            <div style="font-weight:700;font-size:18px">내 물건 팔기</div>
+          </header>
+
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:20px">
+
+            <sc-if value="{{bannerBlocked}}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="display:flex;gap:10px;padding:12px;border-radius:8px;background:#FEF3F2;border:1px solid #B42318;color:#7A271A;font-size:14px">
+              <svg width="20" height="20" style="flex:none;margin-top:2px" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg>
+              <div><div style="font-weight:700">등록이 차단되었어요</div><div>{{bannerBlockedText}}</div></div>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{bannerNoRedirect}}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:8px;background:#FFF1E6;border:1px solid #C2410C;color:#7C2D12;font-size:14px">
+              <div><div style="font-weight:700">등록은 완료됐어요</div><div>게시글 상세 화면으로 이동하지 못했어요. 아래에서 바로 확인할 수 있어요.</div></div>
+              <div style="display:flex;gap:8px">
+                <button onClick="{{ openDetail }}" style="flex:1;min-height:44px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:14px;font-weight:700">게시글 보기</button>
+                <button onClick="{{ goMine }}" style="flex:1;min-height:44px;border-radius:8px;border:1px solid #C2410C;background:#FFFFFF;color:#7C2D12;font-size:14px;font-weight:700">내 판매 목록</button>
+              </div>
+            </div>
+            </sc-if>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="lbl">사진</div>
+              <div style="display:flex;gap:10px;overflow-x:auto;padding:12px 12px 0 0">
+                <button onClick="{{ openPhotoSheet }}" aria-label="사진 추가" style="flex:none;width:80px;height:80px;border-radius:8px;border:1px dashed #8A94A0;background:#FFFFFF;color:#1F2328;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+                  <span>{{photoCountText}}</span>
+                </button>
+                <sc-for list="{{photos}}" as="p" hint-placeholder-count="1">
+                <div style="position:relative;flex:none;width:80px;height:80px">
+                  <div style="position:absolute;inset:0;border-radius:8px;overflow:hidden;background:#E5E7EB;color:#5B6470;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px">
+                    <sc-if value="{{p.checking}}" hint-placeholder-val="{{ false }}">
+                    <svg class="spin" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#C9CED6" stroke-width="3"></circle><path d="M21 12a9 9 0 00-9-9" fill="none" stroke="#1F2328" stroke-width="3" stroke-linecap="round"></path></svg>
+                    <span>확인 중</span>
+                    </sc-if>
+                    <sc-if value="{{p.ready}}" hint-placeholder-val="{{ true }}">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>
+                    <span>사진 {{p.n}}</span>
+                    </sc-if>
+                    <sc-if value="{{p.showImg}}" hint-placeholder-val="{{ false }}">
+                    <img src="{{p.src}}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                    </sc-if>
+                  </div>
+                  <button onClick="{{ p.remove }}" aria-label="사진 삭제" style="position:absolute;top:-12px;right:-12px;width:44px;height:44px;border:none;background:none;display:flex;align-items:flex-start;justify-content:flex-end;padding:0">
+                    <span style="width:22px;height:22px;border-radius:11px;background:#1F2328;color:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+                  </button>
+                </div>
+                </sc-for>
+              </div>
+              <div style="font-size:12px;color:#5B6470">JPG·PNG·WEBP · 장당 10MB 이하 · 최대 10장</div>
+              <sc-if value="{{photoError}}" hint-placeholder-val="{{ false }}">
+              <div role="alert" class="err" style="align-items:flex-start"><svg width="16" height="16" style="flex:none;margin-top:3px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg><span>{{photoError}}</span></div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <label for="f-title" class="lbl">제목</label>
+              <input id="f-title" type="text" value="{{title}}" onChange="{{ onTitle }}" onFocus="{{ focusTitle }}" placeholder="글 제목" style="height:48px;box-sizing:border-box;padding:0 12px;border-radius:8px;border:1px solid {{titleBorder}};background:#FFFFFF">
+              <sc-if value="{{errTitle}}" hint-placeholder-val="{{ false }}">
+              <div role="alert" class="err"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg><span>{{errTitle}}</span></div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="lbl">카테고리</div>
+              <button onClick="{{ openCategory }}" style="height:48px;box-sizing:border-box;padding:0 12px;border-radius:8px;border:1px solid {{categoryBorder}};background:#FFFFFF;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:{{categoryColor}};text-align:left">
+                <span>{{categoryLabel}}</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
+              </button>
+              <sc-if value="{{errCategory}}" hint-placeholder-val="{{ false }}">
+              <div role="alert" class="err"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg><span>{{errCategory}}</span></div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <label for="f-price" class="lbl">판매 가격</label>
+              <div style="display:flex;align-items:center;height:48px;box-sizing:border-box;padding:0 12px;border-radius:8px;border:1px solid {{priceBorder}};background:#FFFFFF">
+                <input id="f-price" type="text" inputmode="numeric" value="{{price}}" onChange="{{ onPrice }}" onFocus="{{ focusPrice }}" placeholder="가격을 입력해 주세요" style="flex:1;min-width:0;height:44px;border:none;background:none;padding:0;outline-offset:6px">
+                <span style="color:#5B6470">원</span>
+              </div>
+              <sc-if value="{{errPrice}}" hint-placeholder-val="{{ false }}">
+              <div role="alert" class="err"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg><span>{{errPrice}}</span></div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <label for="f-desc" class="lbl">자세한 설명 <span style="font-weight:400;color:#5B6470">(선택)</span></label>
+              <textarea id="f-desc" value="{{desc}}" onChange="{{ onDesc }}" onFocus="{{ focusDesc }}" placeholder="물건의 상태, 사용 기간, 거래 희망 장소를 적어 주세요." style="height:140px;box-sizing:border-box;padding:12px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;resize:none;line-height:1.5"></textarea>
+            </div>
+          </div>
+
+          <div style="flex:none;padding:12px 16px;border-top:1px solid #E3E6EA;background:#FFFFFF">
+            <button onClick="{{ submit }}" aria-disabled="{{ submitAria }}" style="width:100%;height:52px;border-radius:8px;border:none;background:{{submitBg}};color:#FFFFFF;font-size:17px;font-weight:700;opacity:{{submitOpacity}}">{{submitLabel}}</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- 게시글 상세 -->
+        <sc-if value="{{isDetail}}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <header style="height:56px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px;border-bottom:1px solid #E3E6EA">
+            <button onClick="{{ goHome }}" aria-label="홈으로" style="width:48px;height:48px;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#1F2328"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+            <div style="font-weight:700;font-size:18px">게시글</div>
+          </header>
+          <div style="flex:1;min-height:0;overflow-y:auto">
+            <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#FFF1E6;color:#7C2D12;font-size:14px;font-weight:500">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>등록이 완료됐어요
+            </div>
+            <div style="position:relative;height:240px;background:#E5E7EB;color:#5B6470;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:14px">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>
+              <span>{{detail.photoText}}</span>
+              <sc-if value="{{detail.showImg}}" hint-placeholder-val="{{ false }}">
+              <img src="{{detail.src}}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+              </sc-if>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5B6470"><span style="padding:2px 8px;border-radius:4px;background:#F5F6F8;color:#1F2328;font-weight:500">내가 쓴 글</span><span>우리 동네</span></div>
+              <div style="font-size:20px;font-weight:700">{{detail.title}}</div>
+              <div style="font-size:13px;color:#5B6470">{{detail.category}} · 방금 전</div>
+              <div style="font-size:15px;white-space:pre-wrap">{{detail.desc}}</div>
+            </div>
+          </div>
+          <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid #E3E6EA;background:#FFFFFF">
+            <div style="font-size:18px;font-weight:700">{{detail.priceText}}</div>
+            <button onClick="{{ goMine }}" style="height:48px;padding:0 20px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:15px;font-weight:700">내 판매 목록 보기</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- 내 판매 목록 -->
+        <sc-if value="{{isMine}}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <header style="height:56px;flex:none;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #E3E6EA"><div style="font-weight:700;font-size:18px">내 판매 목록</div></header>
+          <div style="flex:none;display:flex;gap:8px;padding:12px 16px"><span style="padding:6px 14px;border-radius:16px;background:#1F2328;color:#FFFFFF;font-size:14px;font-weight:500">판매중</span></div>
+          <div style="flex:1;min-height:0;overflow-y:auto">
+            <sc-if value="{{listHas}}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{myPosts}}" as="m" hint-placeholder-count="1">
+              <div style="display:flex;gap:12px;padding:16px;border-top:1px solid #EEF0F2">
+                <div style="position:relative;flex:none;width:88px;height:88px;border-radius:8px;overflow:hidden;background:#E5E7EB;color:#5B6470;display:flex;align-items:center;justify-content:center">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>
+                  <sc-if value="{{m.showImg}}" hint-placeholder-val="{{ false }}">
+                  <img src="{{m.src}}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                  </sc-if>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:2px">
+                  <div style="display:flex;align-items:center;gap:6px"><span style="padding:1px 8px;border-radius:4px;background:#FFF1E6;color:#7C2D12;font-size:12px;font-weight:700">판매중</span><span style="font-size:12px;color:#5B6470">방금 전</span></div>
+                  <div style="font-size:16px;font-weight:500">{{m.title}}</div>
+                  <div style="font-size:16px;font-weight:700;margin-top:2px">{{m.priceText}}</div>
+                </div>
+              </div>
+              </sc-for>
+            </div>
+            </sc-if>
+            <sc-if value="{{listMissing}}" hint-placeholder-val="{{ false }}">
+            <div style="padding:100px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg>
+              <div style="font-weight:700;font-size:17px">방금 등록한 글이 아직 보이지 않아요</div>
+              <div style="color:#5B6470;font-size:14px">등록은 완료됐어요. 목록을 새로고침하면 확인할 수 있어요.</div>
+              <button onClick="{{ refreshList }}" style="margin-top:8px;min-height:44px;padding:0 20px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:15px;font-weight:700">새로고침</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{listEmpty}}" hint-placeholder-val="{{ false }}">
+            <div style="padding:120px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px">
+              <div style="font-weight:700;font-size:17px">아직 등록한 글이 없어요</div>
+              <div style="color:#5B6470;font-size:14px">홈에서 글쓰기를 눌러 첫 물건을 등록해 보세요.</div>
+            </div>
+            </sc-if>
+          </div>
+          <nav style="flex:none;height:64px;display:flex;border-top:1px solid #E3E6EA;background:#FFFFFF">
+            <button class="tab" onClick="{{ goHome }}" style="font-weight:500;color:#5B6470"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg>홈</button>
+            <button class="tab" onClick="{{ goMine }}" style="font-weight:700;color:{{accent}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"></path></svg>내 판매 목록</button>
+          </nav>
+        </div>
+        </sc-if>
+
+        <!-- 사진 선택 시트 -->
+        <sc-if value="{{sheetPhoto}}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:20">
+          <button onClick="{{ closeSheet }}" aria-label="닫기" style="position:absolute;inset:0;width:100%;height:100%;border:none;background:rgba(0,0,0,.5);padding:0"></button>
+          <div role="dialog" aria-modal="true" aria-label="사진 추가" style="position:absolute;left:0;right:0;bottom:0;background:#FFFFFF;border-radius:16px 16px 0 0;padding:12px 16px 24px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="font-weight:700;font-size:17px;padding:0 4px">사진 추가</div>
+              <button onClick="{{ closeSheet }}" aria-label="닫기" style="width:44px;height:44px;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#1F2328"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+            </div>
+            <button class="sheetbtn" onClick="{{ pickCamera }}">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>카메라로 촬영하기
+            </button>
+            <sc-if value="{{permOk}}" hint-placeholder-val="{{ true }}">
+            <label for="album-input" class="sheetbtn" style="cursor:pointer">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>앨범(내 컴퓨터)에서 선택하기
+            </label>
+            </sc-if>
+            <sc-if value="{{permDeny}}" hint-placeholder-val="{{ false }}">
+            <button class="sheetbtn" onClick="{{ albumDenied }}">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="M21 16l-5-5-8 8"></path></svg>앨범(내 컴퓨터)에서 선택하기
+            </button>
+            </sc-if>
+            <input id="album-input" type="file" accept="image/*" onChange="{{ onFile }}" aria-label="사진 파일 선택" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden">
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- 카테고리 시트 -->
+        <sc-if value="{{sheetCategory}}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:20">
+          <button onClick="{{ closeSheet }}" aria-label="닫기" style="position:absolute;inset:0;width:100%;height:100%;border:none;background:rgba(0,0,0,.5);padding:0"></button>
+          <div role="dialog" aria-modal="true" aria-label="카테고리 선택" style="position:absolute;left:0;right:0;bottom:0;max-height:560px;overflow-y:auto;background:#FFFFFF;border-radius:16px 16px 0 0;padding:12px 16px 24px;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="font-weight:700;font-size:17px;padding:0 4px">카테고리 선택</div>
+              <button onClick="{{ closeSheet }}" aria-label="닫기" style="width:44px;height:44px;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#1F2328"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+            </div>
+            <sc-for list="{{categories}}" as="c" hint-placeholder-count="8">
+            <button onClick="{{ c.pick }}" style="min-height:52px;border:none;border-top:1px solid #EEF0F2;background:#FFFFFF;display:flex;align-items:center;padding:0 4px;font-size:16px;color:#1F2328;text-align:left">{{c.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- 안내 팝업 -->
+        <sc-if value="{{hasDialog}}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:24px;box-sizing:border-box">
+          <div role="alertdialog" aria-modal="true" aria-label="{{dlg.title}}" style="width:100%;background:#FFFFFF;border-radius:16px;padding:24px 20px 16px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-weight:700;font-size:18px">{{dlg.title}}</div>
+            <div style="font-size:15px;color:#3F4752">{{dlg.body}}</div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <sc-if value="{{dlg.hasSecondary}}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ closePopup }}" style="flex:1;height:48px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;color:#1F2328;font-size:15px;font-weight:500">닫기</button>
+              </sc-if>
+              <button onClick="{{ popupPrimary }}" style="flex:1;height:48px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:15px;font-weight:700">{{dlg.primary}}</button>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- 검증/저장 진행 -->
+        <sc-if value="{{hasBusy}}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4)">
+          <div role="status" style="width:240px;background:#FFFFFF;border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+            <svg class="spin" width="36" height="36" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#E5E7EB" stroke-width="3"></circle><path d="M21 12a9 9 0 00-9-9" fill="none" stroke="{{accent}}" stroke-width="3" stroke-linecap="round"></path></svg>
+            <div style="font-weight:700;font-size:16px">{{busy.title}}</div>
+            <div style="font-size:13px;color:#5B6470">{{busy.body}}</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="position:absolute;left:24px;right:24px;bottom:88px;z-index:40;padding:12px 16px;border-radius:8px;background:#1F2328;color:#FFFFFF;font-size:14px;text-align:center">{{toast}}</div>
+        </sc-if>
+      </div>
+      </div>
+
+      <!-- ===== 오른쪽: 시나리오 설명 ===== -->
+      <div style="flex:1 1 280px;max-width:340px;min-width:260px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:15px">{{cur.sentence}}</div>
+        <div style="font-size:13px;color:#5B6470">화면 위치 · {{cur.path}}</div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:8px;background:#FFFFFF;border:1px solid #DDE1E6;font-size:14px">
+          <svg width="18" height="18" style="flex:none;margin-top:2px" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg>
+          <span>{{cur.hint}}</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ goPrev }}" disabled="{{ prevDisabled }}" style="min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;color:#1F2328;font-size:14px;font-weight:500;opacity:{{prevOpacity}}">← 이전 화면</button>
+          <button onClick="{{ goNext }}" disabled="{{ nextDisabled }}" style="min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF;color:#1F2328;font-size:14px;font-weight:500;opacity:{{nextOpacity}}">다음 화면 →</button>
+          <button onClick="{{ goStart }}" style="min-height:44px;padding:0 14px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:14px;font-weight:700">처음부터 다시</button>
+        </div>
+        <div style="padding:10px 12px;border-radius:8px;background:#F5F6F8;font-size:13px;color:#3F4752">
+          <div style="font-weight:700;color:#1F2328;margin-bottom:2px">현재 테스트 설정</div>
+          {{settingsSummary}}
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- 전체 화면 펼쳐 보기 -->
+    <sc-if value="{{viewAll}}" hint-placeholder-val="{{ false }}">
+    <div style="width:100%;max-width:1400px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-size:14px;color:#3F4752">화면을 누르면 해당 화면이 크게 열려요. 지금 보던 화면은 강조되어 있어요.</div>
+
+      <div style="font-size:14px;font-weight:700;color:#1F2328">성공 시나리오</div>
+      <div style="display:flex;flex-wrap:wrap;gap:20px">
+        <sc-for list="{{okCards}}" as="c" hint-placeholder-count="14">
+        <div style="width:234px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:6px"><span style="flex:none;padding:1px 6px;border-radius:6px;background:{{c.badgeBg}};color:{{c.badgeFg}};font-size:12px;font-weight:700">{{c.badge}}</span><span style="font-size:13px;font-weight:700">{{c.label}}</span></div>
+          <div style="position:relative;width:234px;height:507px;border-radius:18px;overflow:hidden;background:#FFFFFF;box-shadow:{{c.shadow}}">
+            <div aria-hidden="true" style="width:390px;height:844px;transform:scale(0.6);transform-origin:0 0;pointer-events:none">
+              <sc-if value="{{c.isHome}}" hint-placeholder-val="{{ false }}"><dc-import name="HomeScreen" mode="{{ c.home.mode }}" overlay="{{ c.home.overlay }}" hint-size="390px,844px"></dc-import></sc-if>
+              <sc-if value="{{c.isWrite}}" hint-placeholder-val="{{ false }}"><dc-import name="WriteScreen" photos="{{ c.write.photos }}" title-text="{{ c.write.titleText }}" category-text="{{ c.write.categoryText }}" desc-text="{{ c.write.descText }}" price-text="{{ c.write.priceText }}" err-title="{{ c.write.errTitle }}" err-category="{{ c.write.errCategory }}" err-price="{{ c.write.errPrice }}" photo-error="{{ c.write.photoError }}" banner="{{ c.write.banner }}" overlay="{{ c.write.overlay }}" focus="{{ c.write.focus }}" submit-state="{{ c.write.submitState }}" toast="{{ c.write.toast }}" hint-size="390px,844px"></dc-import></sc-if>
+              <sc-if value="{{c.isDetail}}" hint-placeholder-val="{{ false }}"><dc-import name="DetailScreen" hint-size="390px,844px"></dc-import></sc-if>
+              <sc-if value="{{c.isList}}" hint-placeholder-val="{{ false }}"><dc-import name="ListScreen" mode="{{ c.list.mode }}" hint-size="390px,844px"></dc-import></sc-if>
+            </div>
+            <button onClick="{{ c.open }}" aria-label="{{c.aria}}" style="position:absolute;inset:0;width:100%;height:100%;border:none;background:transparent;padding:0;cursor:pointer"></button>
+          </div>
+        </div>
+        </sc-for>
+      </div>
+
+      <div style="font-size:14px;font-weight:700;color:#1F2328;margin-top:8px">실패 케이스 (예외 케이스)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:20px">
+        <sc-for list="{{failCards}}" as="c" hint-placeholder-count="11">
+        <div style="width:234px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:6px"><span style="flex:none;padding:1px 6px;border-radius:6px;background:{{c.badgeBg}};color:{{c.badgeFg}};font-size:12px;font-weight:700">{{c.badge}}</span><span style="font-size:13px;font-weight:700">{{c.label}}</span></div>
+          <div style="position:relative;width:234px;height:507px;border-radius:18px;overflow:hidden;background:#FFFFFF;box-shadow:{{c.shadow}}">
+            <div aria-hidden="true" style="width:390px;height:844px;transform:scale(0.6);transform-origin:0 0;pointer-events:none">
+              <sc-if value="{{c.isHome}}" hint-placeholder-val="{{ false }}"><dc-import name="HomeScreen" mode="{{ c.home.mode }}" overlay="{{ c.home.overlay }}" hint-size="390px,844px"></dc-import></sc-if>
+              <sc-if value="{{c.isWrite}}" hint-placeholder-val="{{ false }}"><dc-import name="WriteScreen" photos="{{ c.write.photos }}" title-text="{{ c.write.titleText }}" category-text="{{ c.write.categoryText }}" desc-text="{{ c.write.descText }}" price-text="{{ c.write.priceText }}" err-title="{{ c.write.errTitle }}" err-category="{{ c.write.errCategory }}" err-price="{{ c.write.errPrice }}" photo-error="{{ c.write.photoError }}" banner="{{ c.write.banner }}" overlay="{{ c.write.overlay }}" focus="{{ c.write.focus }}" submit-state="{{ c.write.submitState }}" toast="{{ c.write.toast }}" hint-size="390px,844px"></dc-import></sc-if>
+              <sc-if value="{{c.isDetail}}" hint-placeholder-val="{{ false }}"><dc-import name="DetailScreen" hint-size="390px,844px"></dc-import></sc-if>
+              <sc-if value="{{c.isList}}" hint-placeholder-val="{{ false }}"><dc-import name="ListScreen" mode="{{ c.list.mode }}" hint-size="390px,844px"></dc-import></sc-if>
+            </div>
+            <button onClick="{{ c.open }}" aria-label="{{c.aria}}" style="position:absolute;inset:0;width:100%;height:100%;border:none;background:transparent;padding:0;cursor:pointer"></button>
+          </div>
+        </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+  </main>
+<sc-if value="{{settingsOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box">
+  <button onClick="{{ toggleSettings }}" aria-label="설정 닫기 (바깥 영역)" style="position:absolute;inset:0;width:100%;height:100%;border:none;background:rgba(0,0,0,.5);padding:0;cursor:default"></button>
+      <section id="settings-panel" aria-label="테스트 설정" class="setbar" role="dialog" aria-modal="true" style="position:relative;width:480px;max-width:100%;max-height:90vh;overflow-y:auto;background:#FFFFFF;border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.3);padding:20px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="font-size:16px;font-weight:700">테스트 설정</div>
+          <button onClick="{{ toggleSettings }}" aria-label="설정 닫기" style="width:44px;height:44px;margin:-8px -8px -8px 0;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#1F2328"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+        <div style="font-size:13px;color:#5B6470;margin-top:-8px">실제로 테스트하기 어려운 예외 상황을 여기서 켜 볼 수 있어요.</div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="set-net" class="setlbl">네트워크·서버 상태</label>
+          <select id="set-net" class="setsel" value="{{net}}" onChange="{{ onNet }}">
+            <option value="ok">정상</option>
+            <option value="off">연결 끊김·서버 오류</option>
+          </select>
+          <div style="font-size:12px;color:#5B6470">끊김이면 앱 실행 후 홈이 로딩되지 않고(2-1), 저장 시 실패해요(11-1).</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="set-acc" class="setlbl">계정 상태</label>
+          <select id="set-acc" class="setsel" value="{{account}}" onChange="{{ onAccount }}">
+            <option value="ok">정상</option>
+            <option value="expired">로그인 세션 만료</option>
+            <option value="banned">이용 제한(제재)</option>
+          </select>
+          <div style="font-size:12px;color:#5B6470">정상이 아니면 글쓰기를 눌렀을 때 진입이 막혀요(3-1).</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="set-perm" class="setlbl">사진·카메라 권한</label>
+          <select id="set-perm" class="setsel" value="{{perm}}" onChange="{{ onPerm }}">
+            <option value="allow">허용</option>
+            <option value="deny">거부</option>
+          </select>
+          <div style="font-size:12px;color:#5B6470">거부면 카메라·앨범 선택 시 권한 안내 팝업이 나와요(4-1).</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label for="set-banned" class="setlbl">금칙어·판매 금지 품목 DB (임시)</label>
+          <input id="set-banned" type="text" value="{{banned}}" onChange="{{ onBanned }}" style="height:44px;box-sizing:border-box;padding:0 10px;border-radius:8px;border:1px solid #8A94A0;background:#FFFFFF">
+          <div style="font-size:12px;color:#5B6470">쉼표로 구분해요. 제목이나 설명에 포함되면 등록이 차단돼요(10-1).</div>
+        </div>
+
+        <div style="border-top:1px solid #EEF0F2;padding-top:12px;font-size:12px;color:#5B6470">
+          <div style="font-weight:700;color:#1F2328;margin-bottom:2px">사진 첨부 기준 (제안값)</div>
+          형식 JPG·PNG·WEBP · 장당 10MB 이하 · 최대 10장. 기준에 맞지 않는 파일은 5-1 오류 안내가 나와요.
+        </div>
+      <button onClick="{{ toggleSettings }}" style="min-height:48px;border-radius:8px;border:none;background:{{accent}};color:#FFFFFF;font-size:15px;font-weight:700">확인</button>
+      </section>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#C2410C","options":["#C2410C","#1D4ED8","#047857","#6D28D9"]},"$preview":{"width":1440,"height":980}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      scenario: 's01',
+      screen: 'splash',
+      feedLoading: false,
+      photos: [],
+      title: '',
+      category: '',
+      desc: '',
+      price: '',
+      errors: {},
+      photoError: '',
+      banner: null,
+      bannerWord: '',
+      sheet: null,
+      popup: null,
+      stage: null,
+      toast: '',
+      posts: [],
+      current: null,
+      hideList: false,
+      phone: '',
+      net: 'ok',
+      account: 'ok',
+      perm: 'allow',
+      settingsOpen: false,
+      viewAll: false,
+      banned: '담배, 마약, 총기, 위조지폐, 도박'
+    };
+    this.seq = 0;
+    this.timers = [];
+  }
+
+  componentDidMount() {
+    this.launch();
+  }
+
+  componentWillUnmount() {
+    this.clearTimers();
+  }
+
+  later(fn, ms) {
+    this.timers.push(setTimeout(fn, ms));
+  }
+
+  clearTimers() {
+    this.timers.forEach((t) => clearTimeout(t));
+    this.timers = [];
+  }
+
+  scenarios() {
+    const mk = (id, badge, kind, label, sentence, path, hint) => ({ id, badge, kind, label, sentence, path, hint });
+    return [
+      mk('s01', '1', 'ok', 'dg_1_1_1 앱 스플래시', '사용자는 당근마켓 앱을 실행한다. (전제: 로그인 및 동네 인증 완료)', '홈 화면 (스플래시)', '잠시 후 홈 화면으로 자동으로 넘어가요.'),
+      mk('s02', '2', 'ok', 'dg_2_1_2 동네 피드 목록', '시스템은 로그인 상태를 확인하고 동네 피드를 불러와 홈 화면에 표시한다.', '홈 화면', '오른쪽 아래 글쓰기 버튼을 눌러 보세요.'),
+      mk('s03', '3', 'ok', 'dg_3 내 물건 팔기', '사용자는 글쓰기 버튼을 눌러 내 물건 팔기 화면으로 이동한다.', '홈 화면 > 내 물건 팔기 화면', '카메라 아이콘으로 사진을 추가하고, 제목·카테고리·가격은 순서와 관계없이 직접 입력해 보세요.'),
+      mk('s04', '4', 'ok', 'dg_3_1_2 사진 선택 시트 (카메라·앨범)', '사용자는 사진을 촬영하거나 앨범에서 선택해 첨부한다.', '내 물건 팔기 화면 > 사진 첨부 영역, 카메라·앨범 화면', '앨범에서 선택하기는 내 컴퓨터의 파일 선택창이 열려요. 카메라는 카메라 화면과 닫기 버튼이 나와요.'),
+      mk('s05', '5', 'ok', 'dg_3_1_6 사진 미리보기·삭제', '시스템은 첨부된 사진의 형식과 용량을 확인하고 미리보기로 표시한다.', '내 물건 팔기 화면 > 사진 첨부 영역', '사진을 더 추가하거나 ×로 삭제할 수 있어요.'),
+      mk('s06', '6', 'ok', 'dg_3_2_1 제목 입력', '사용자는 제목을 입력한다.', '내 물건 팔기 화면 > 제목 입력 필드', '제목을 직접 입력해 보세요.'),
+      mk('s07a', '7', 'ok', 'dg_3_2_2 카테고리 선택 시트', '사용자는 카테고리를 선택하고 상세 설명을 입력한다.', '내 물건 팔기 화면 > 카테고리 선택, 상세 설명 입력 필드', '카테고리를 고르거나 ×·바깥 영역을 눌러 닫을 수 있어요.'),
+      mk('s07b', '7', 'ok', 'dg_3_2_3 상세 설명 입력 (선택)', '사용자는 카테고리를 선택하고 상세 설명을 입력한다.', '내 물건 팔기 화면 > 카테고리 선택, 상세 설명 입력 필드', '상세 설명은 선택 항목이라 비워 둬도 돼요.'),
+      mk('s08', '8', 'ok', 'dg_3_2_4 가격 입력', '사용자는 판매 가격을 입력한다.', '내 물건 팔기 화면 > 가격 입력 필드', '가격을 직접 입력해 보세요. 숫자가 아니면 오류 안내가 나와요.'),
+      mk('s09', '9', 'ok', 'dg_3_3_1 작성 완료 버튼', '사용자는 입력한 내용을 최종 확인하고 작성완료 버튼을 누른다.', '내 물건 팔기 화면 > 작성 완료 버튼', '작성 완료를 누르면 검증과 저장을 거쳐 상세 화면으로 이동해요.'),
+      mk('s10', '10', 'ok', 'dg_3_3_3 필수 항목 검증', '시스템은 필수 항목 입력 여부와 금칙어·판매 금지 품목 포함 여부를 검증한다.', '내 물건 팔기 화면', '필수 항목과 금칙어를 검증하는 중이에요.'),
+      mk('s11', '11', 'ok', 'dg_3_3_7 저장 처리', '시스템은 사진과 입력 내용을 서버에 저장한다.', '내 물건 팔기 화면', '사진과 내용을 서버에 저장하는 중이에요.'),
+      mk('s12', '12', 'ok', 'dg_4_1 상세 화면', '시스템은 게시글 상세 화면으로 이동시킨다.', '게시글 상세 화면', '내 판매 목록 보기 버튼을 눌러 보세요.'),
+      mk('s13', '13', 'ok', 'dg_5_1 목록 화면', '사용자는 내 판매 목록에서 등록한 글이 노출되는 것을 확인한다.', '내 판매 목록 화면', '하단 홈 탭으로 돌아갈 수 있어요.'),
+
+      mk('e2-1', '2-1', 'fail', 'dg_2_1_4 홈 로딩 오류 안내', '네트워크가 연결되지 않아 앱 실행 후 홈 화면이 로딩되지 않는다.', '홈 화면 (로딩·오류 안내)', '설정의 네트워크·서버를 정상으로 바꾼 뒤 다시 시도해 보세요.'),
+      mk('e3-1', '3-1', 'fail', 'dg_1_3_1 로그인 만료 안내 팝업', '로그인 세션 만료 또는 계정 제재로 글쓰기 화면에 진입하지 못한다.', '홈 화면 > 로그인 화면 또는 이용 제한 안내', '로그인하기를 누르면 로그인 화면으로 이동하고, 로그인하면 정상 상태로 돌아와요.'),
+      mk('e4-1', '4-1', 'fail', 'dg_3_1_8 사진·카메라 접근 권한 팝업', '카메라·사진 접근 권한을 거부해 사진을 촬영하거나 선택하지 못한다.', '내 물건 팔기 화면 > 사진 접근 권한 팝업', '설정의 사진·카메라 권한을 허용으로 바꾸면 다시 선택할 수 있어요.'),
+      mk('e5-1', '5-1', 'fail', 'dg_3_1_7 사진 첨부 오류 안내', '지원하지 않는 형식이거나 용량이 큰 사진이라 첨부되지 않는다.', '내 물건 팔기 화면 > 사진 첨부 영역 (오류 안내)', 'GIF 같은 다른 형식이나 10MB가 넘는 사진을 직접 선택해 확인해 보세요.'),
+      mk('e6-1', '6-1', 'fail', 'dg_3_2_5_1 제목 오류', '제목을 입력하지 않고 다음 단계로 넘어가려 한다.', '내 물건 팔기 화면 > 제목 입력 필드 (오류 안내)', '제목을 입력한 뒤 다시 작성 완료를 눌러 보세요.'),
+      mk('e8-1', '8-1', 'fail', 'dg_3_2_5_3 가격 오류', '가격을 입력하지 않거나 숫자가 아닌 값을 입력한다.', '내 물건 팔기 화면 > 가격 입력 필드 (오류 안내)', '가격을 숫자로 고친 뒤 다시 작성 완료를 눌러 보세요.'),
+      mk('e9-1', '9-1', 'fail', 'dg_3_3_2 중복 클릭 방지·안내', '작성완료 버튼을 여러 번 눌러 같은 물건이 중복 등록된다.', '내 물건 팔기 화면 > 작성 완료 버튼, 내 판매 목록 화면', '등록 중에 작성 완료를 다시 눌러도 중복 등록 없이 안내만 나와요.'),
+      mk('e10-1', '10-1', 'fail', 'dg_3_3_5 등록 차단 안내', '금칙어나 판매 금지 품목이 포함되어 등록이 차단된다.', '내 물건 팔기 화면 (등록 차단 안내)', '오른쪽 설정에서 금칙어를 바꾸거나, 제목을 고친 뒤 다시 등록해 보세요.'),
+      mk('e11-1', '11-1', 'fail', 'dg_3_3_8 저장 실패 팝업·재시도', '저장 시점에 네트워크 끊김이나 서버 오류가 발생해 등록되지 않는다.', '내 물건 팔기 화면 (네트워크·서버 팝업)', '설정의 네트워크·서버를 정상으로 바꾼 뒤 다시 시도해 보세요.'),
+      mk('e12-1', '12-1', 'fail', 'dg_4_1_5 상세 이동 실패 안내', '등록은 처리됐지만 게시글 상세 화면으로 이동하지 않아 등록 여부를 알 수 없다.', '내 물건 팔기 화면', '게시글 보기 또는 내 판매 목록 버튼을 눌러 보세요.'),
+      mk('e13-1', '13-1', 'fail', 'dg_5_1_4 목록 미노출 안내·새로고침', '등록 후 내 판매 목록에 글이 노출되지 않는다.', '내 판매 목록 화면', '새로고침을 누르면 등록한 글이 표시돼요.')
+    ];
+  }
+
+  sample() {
+    return {
+      title: '접이식 캠핑 의자',
+      category: '생활/주방',
+      desc: '작년 여름에 두 번 사용했어요. 접힘 상태 양호하고 수납 가방 포함입니다. 직거래 선호해요.',
+      priceText: '15,000원',
+      photos: [
+        { id: 'sp1', name: '샘플 사진 1', src: '', status: 'ok' },
+        { id: 'sp2', name: '샘플 사진 2', src: '', status: 'ok' }
+      ]
+    };
+  }
+
+  launch() {
+    this.clearTimers();
+    this.setState({ screen: 'splash', scenario: 's01', sheet: null, popup: null, stage: null, banner: null, toast: '', feedLoading: false });
+    this.later(() => {
+      this.setState({ screen: 'home', feedLoading: true, scenario: this.state.net === 'off' ? 'e2-1' : 's02' });
+      this.later(() => this.setState({ feedLoading: false }), 800);
+    }, 2000);
+  }
+
+  preset(id) {
+    this.clearTimers();
+    const S = this.sample();
+    const base = { sheet: null, popup: null, stage: null, banner: null, bannerWord: '', errors: {}, photoError: '', toast: '', feedLoading: false, hideList: false, scenario: id };
+    const okSet = { net: 'ok', account: 'ok', perm: 'allow' };
+    const EMPTY = { photos: [], title: '', category: '', desc: '', price: '' };
+    const FULL = { photos: S.photos, title: S.title, category: S.category, desc: S.desc, price: '15000' };
+    const W = { screen: 'write' };
+    const posts = this.state.posts.length > 0 ? this.state.posts : [S];
+    const cur = this.state.posts.length > 0 ? this.state.posts[0] : S;
+    const M = (...o) => Object.assign({}, base, ...o);
+
+    switch (id) {
+      case 's01':
+        this.setState(M(okSet));
+        this.launch();
+        return;
+      case 'e2-1':
+        this.setState(M({ net: 'off', account: 'ok', perm: 'allow' }));
+        this.launch();
+        return;
+      case 's02': this.setState(M(okSet, { screen: 'home' })); return;
+      case 's03': this.setState(M(okSet, W, EMPTY)); return;
+      case 's04': this.setState(M(okSet, W, EMPTY, { sheet: 'photo' })); return;
+      case 's05': this.setState(M(okSet, W, EMPTY, { photos: S.photos })); return;
+      case 's06': this.setState(M(okSet, W, EMPTY, { photos: S.photos, title: S.title })); return;
+      case 's07a': this.setState(M(okSet, W, EMPTY, { photos: S.photos, title: S.title, sheet: 'category' })); return;
+      case 's07b': this.setState(M(okSet, W, EMPTY, { photos: S.photos, title: S.title, category: S.category, desc: S.desc })); return;
+      case 's08': this.setState(M(okSet, W, FULL)); return;
+      case 's09':
+        this.setState(M(okSet, W, FULL), () => this.submit());
+        return;
+      case 's10': this.setState(M(okSet, W, FULL, { stage: 'validating' })); return;
+      case 's11': this.setState(M(okSet, W, FULL, { stage: 'saving' })); return;
+      case 's12': this.setState(M(okSet, { screen: 'detail', current: cur, posts })); return;
+      case 's13': this.setState(M(okSet, { screen: 'mine', posts })); return;
+      case 'e3-1': this.setState(M({ net: 'ok', account: 'expired', perm: 'allow' }, { screen: 'home', popup: 'session' })); return;
+      case 'e4-1': this.setState(M({ net: 'ok', account: 'ok', perm: 'deny' }, W, EMPTY, { popup: 'permission' })); return;
+      case 'e5-1': this.setState(M(okSet, W, EMPTY, { photoError: '지원하지 않는 형식이에요. JPG, PNG, WEBP 사진만 첨부할 수 있어요.' })); return;
+      case 'e6-1': this.setState(M(okSet, W, FULL, { title: '', errors: { title: '제목을 입력해 주세요.' } })); return;
+      case 'e8-1': this.setState(M(okSet, W, FULL, { price: '만원', errors: { price: '가격은 숫자만 입력할 수 있어요.' } })); return;
+      case 'e9-1':
+        this.setState(M(okSet, W, FULL, { stage: 'saving', toast: '이미 등록하고 있어요. 잠시만 기다려 주세요.' }));
+        return;
+      case 'e10-1': this.setState(M(okSet, W, FULL, { title: '담배 팔아요', banner: 'blocked', bannerWord: '담배' })); return;
+      case 'e11-1': this.setState(M({ net: 'off', account: 'ok', perm: 'allow' }, W, FULL, { popup: 'save' })); return;
+      case 'e12-1': this.setState(M(okSet, W, EMPTY, { banner: 'noRedirect', current: cur, posts })); return;
+      case 'e13-1': this.setState(M(okSet, { screen: 'mine', posts, hideList: true })); return;
+      default: return;
+    }
+  }
+
+  updatePhoto(id, patch) {
+    this.setState({ photos: this.state.photos.map((p) => (p.id === id ? Object.assign({}, p, patch) : p)) });
+  }
+
+  addPhoto(name, file) {
+    const id = ++this.seq;
+    this.setState({ photos: [...this.state.photos, { id, name, src: '', status: 'checking' }], photoError: '', sheet: null, screen: 'write', scenario: 's05' });
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => this.updatePhoto(id, { src: String(reader.result) });
+      reader.readAsDataURL(file);
+    }
+    this.later(() => this.updatePhoto(id, { status: 'ok' }), 700);
+  }
+
+  onFile(e) {
+    const input = e.target;
+    const f = input.files && input.files[0];
+    if (!f) return;
+    const OK = ['image/jpeg', 'image/png', 'image/webp'];
+    const MAX = 10 * 1024 * 1024;
+    let err = '';
+    if (this.state.photos.length >= 10) err = '사진은 최대 10장까지 첨부할 수 있어요.';
+    else if (OK.indexOf(f.type) < 0) err = '지원하지 않는 형식이에요. JPG, PNG, WEBP 사진만 첨부할 수 있어요.';
+    else if (f.size > MAX) err = '사진 용량이 너무 커요. 장당 10MB 이하 사진만 첨부할 수 있어요.';
+    if (err) {
+      this.setState({ photoError: err, sheet: null, scenario: 'e5-1' });
+    } else {
+      this.addPhoto(f.name, f);
+    }
+    try { input.value = ''; } catch (x) { /* ignore */ }
+  }
+
+  submit() {
+    const s = this.state;
+    if (s.stage) {
+      this.setState({ toast: '이미 등록하고 있어요. 잠시만 기다려 주세요.', scenario: 'e9-1' });
+      this.later(() => this.setState({ toast: '' }), 2000);
+      return;
+    }
+    const title = s.title.trim();
+    const priceRaw = s.price.replace(/,/g, '').trim();
+    const e = {};
+    if (!title) e.title = '제목을 입력해 주세요.';
+    if (!s.category) e.category = '카테고리를 선택해 주세요.';
+    if (!priceRaw) e.price = '가격을 입력해 주세요.';
+    else if (!/^\d+$/.test(priceRaw)) e.price = '가격은 숫자만 입력할 수 있어요.';
+    if (Object.keys(e).length > 0) {
+      this.setState({ errors: e, banner: null, scenario: e.title ? 'e6-1' : e.price ? 'e8-1' : 's09' });
+      return;
+    }
+    this.clearTimers();
+    this.setState({ errors: {}, banner: null, stage: 'pressed', scenario: 's09' });
+    this.later(() => {
+      this.setState({ stage: 'validating', scenario: 's10' });
+      this.later(() => {
+        const st = this.state;
+        const words = st.banned.split(',').map((x) => x.trim()).filter((x) => x);
+        const text = (title + ' ' + st.desc).toLowerCase();
+        const hit = words.find((w) => text.indexOf(w.toLowerCase()) >= 0);
+        if (hit) {
+          this.setState({ stage: null, banner: 'blocked', bannerWord: hit, scenario: 'e10-1' });
+          return;
+        }
+        this.setState({ stage: 'saving', scenario: 's11' });
+        this.later(() => {
+          const st2 = this.state;
+          if (st2.net === 'off') {
+            this.setState({ stage: null, popup: 'save', scenario: 'e11-1' });
+            return;
+          }
+          const post = {
+            title,
+            category: st2.category,
+            desc: st2.desc.trim() || '설명이 없어요.',
+            priceText: Number(priceRaw).toLocaleString('ko-KR') + '원',
+            photos: st2.photos
+          };
+          this.setState({ posts: [post, ...st2.posts], current: post, stage: null, photos: [], title: '', category: '', desc: '', price: '', errors: {}, banner: null, hideList: false, screen: 'detail', scenario: 's12' });
+        }, 900);
+      }, 700);
+    }, 400);
+  }
+
+  previewData() {
+    const FULL = {
+      photos: '2',
+      titleText: '접이식 캠핑 의자',
+      categoryText: '생활/주방',
+      descText: '작년 여름에 두 번 사용했어요. 접힘 상태 양호하고 수납 가방 포함입니다. 직거래 선호해요.',
+      priceText: '15,000'
+    };
+    const W = (d) => ({ comp: 'write', data: d });
+    return {
+      's01': { comp: 'home', data: { mode: 'splash' } },
+      's02': { comp: 'home', data: { mode: 'feed' } },
+      's03': W({}),
+      's04': W({ overlay: 'photoSheet' }),
+      's05': W({ photos: '2' }),
+      's06': W({ photos: '2', titleText: FULL.titleText, focus: 'title' }),
+      's07a': W({ photos: '2', titleText: FULL.titleText, overlay: 'categorySheet' }),
+      's07b': W({ photos: '2', titleText: FULL.titleText, categoryText: FULL.categoryText, descText: FULL.descText, focus: 'desc' }),
+      's08': W(Object.assign({}, FULL, { focus: 'price' })),
+      's09': W(Object.assign({}, FULL, { submitState: 'pressed' })),
+      's10': W(Object.assign({}, FULL, { submitState: 'busy', overlay: 'validating' })),
+      's11': W(Object.assign({}, FULL, { submitState: 'busy', overlay: 'saving' })),
+      's12': { comp: 'detail', data: {} },
+      's13': { comp: 'list', data: { mode: 'has' } },
+      'e2-1': { comp: 'home', data: { mode: 'error' } },
+      'e3-1': { comp: 'home', data: { mode: 'feed', overlay: 'session' } },
+      'e4-1': W({ overlay: 'permission' }),
+      'e5-1': W({ photos: '1', photoError: '지원하지 않는 형식이에요. JPG, PNG, WEBP 사진만 첨부할 수 있어요.' }),
+      'e6-1': W({ photos: '2', categoryText: FULL.categoryText, descText: FULL.descText, priceText: FULL.priceText, errTitle: '제목을 입력해 주세요.' }),
+      'e8-1': W(Object.assign({}, FULL, { priceText: '만원', errPrice: '가격은 숫자만 입력할 수 있어요.' })),
+      'e9-1': W(Object.assign({}, FULL, { submitState: 'busy', toast: '이미 등록하고 있어요. 잠시만 기다려 주세요.' })),
+      'e10-1': W(Object.assign({}, FULL, { titleText: '담배 팔아요', banner: 'blocked', errTitle: '판매할 수 없는 단어나 품목이 포함되어 있어요.' })),
+      'e11-1': W(Object.assign({}, FULL, { overlay: 'saveFail' })),
+      'e12-1': W({ banner: 'noRedirect' }),
+      'e13-1': { comp: 'list', data: { mode: 'missing' } }
+    };
+  }
+
+  cards(list, curId, accent, kind) {
+    const data = this.previewData();
+    const W0 = {
+      photos: '0', titleText: '', categoryText: '', descText: '', priceText: '',
+      errTitle: '', errCategory: '', errPrice: '', photoError: '',
+      banner: 'none', overlay: 'none', focus: 'none', submitState: 'ready', toast: ''
+    };
+    return list.filter((x) => x.kind === kind).map((x) => {
+      const d = data[x.id] || { comp: 'write', data: {} };
+      const active = x.id === curId;
+      const fail = x.kind === 'fail';
+      return {
+        badge: x.badge,
+        label: x.label,
+        badgeBg: fail ? '#FEF3F2' : '#F1F3F5',
+        badgeFg: fail ? '#B42318' : '#3F4752',
+        shadow: active ? '0 0 0 3px ' + accent + ',0 6px 16px rgba(0,0,0,.12)' : '0 0 0 1px #C9CED6,0 6px 16px rgba(0,0,0,.08)',
+        aria: x.badge + ' ' + x.label + ' 화면 열기',
+        isHome: d.comp === 'home',
+        isWrite: d.comp === 'write',
+        isDetail: d.comp === 'detail',
+        isList: d.comp === 'list',
+        home: Object.assign({ mode: 'feed', overlay: 'none' }, d.comp === 'home' ? d.data : {}),
+        write: Object.assign({}, W0, d.comp === 'write' ? d.data : {}),
+        list: Object.assign({ mode: 'has' }, d.comp === 'list' ? d.data : {}),
+        open: () => { this.setState({ viewAll: false }); this.preset(x.id); }
+      };
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const accent = this.props.accent ?? '#C2410C';
+    const list = this.scenarios();
+    const idx = Math.max(0, list.findIndex((x) => x.id === s.scenario));
+    const cur = list[idx];
+
+    const item = (x) => {
+      const active = x.id === cur.id;
+      const fail = x.kind === 'fail';
+      return {
+        badge: x.badge,
+        label: x.label,
+        current: active ? 'true' : 'false',
+        bg: active ? '#FFF1E6' : '#FFFFFF',
+        fg: active ? '#7C2D12' : '#1F2328',
+        weight: active ? 700 : 500,
+        badgeBg: active ? accent : fail ? '#FEF3F2' : '#F1F3F5',
+        badgeFg: active ? '#FFFFFF' : fail ? '#B42318' : '#3F4752',
+        pick: () => this.preset(x.id)
+      };
+    };
+
+    const header = {
+      badge: cur.badge,
+      badgeBg: cur.kind === 'fail' ? '#FEF3F2' : accent,
+      badgeFg: cur.kind === 'fail' ? '#B42318' : '#FFFFFF',
+      label: cur.label,
+      sentence: cur.sentence,
+      path: cur.path,
+      hint: cur.hint
+    };
+
+    const err = s.errors || {};
+    const imgOf = (photos) => {
+      const p = (photos || []).find((x) => x.src);
+      return p ? p.src : '';
+    };
+
+    const dialogs = {
+      permission: { title: '카메라·사진 접근 권한이 필요해요', body: '사진을 촬영하거나 앨범에서 고르려면 접근을 허용해 주세요. 설정에서 언제든 바꿀 수 있어요.', primary: '설정으로 이동', hasSecondary: true },
+      save: { title: '저장하지 못했어요', body: '네트워크 연결이나 서버 상태를 확인한 뒤 다시 시도해 주세요. 작성한 내용은 그대로 남아 있어요.', primary: '다시 시도', hasSecondary: true },
+      session: { title: '다시 로그인해 주세요', body: '로그인 정보가 만료되어 글을 쓸 수 없어요. 로그인한 뒤 다시 시도해 주세요.', primary: '로그인하기', hasSecondary: true },
+      restricted: { title: '이용이 제한된 계정이에요', body: '운영 정책에 따라 글쓰기 기능을 사용할 수 없어요. 자세한 내용은 고객센터에서 확인해 주세요.', primary: '확인', hasSecondary: false }
+    };
+    const dlg = dialogs[s.popup] || { title: '', body: '', primary: '', hasSecondary: true };
+    const busyMap = {
+      validating: { title: '내용을 확인하고 있어요', body: '필수 항목과 판매 금지 품목 포함 여부를 검증하는 중이에요.' },
+      saving: { title: '저장하고 있어요', body: '사진과 입력한 내용을 서버에 저장하는 중이에요.' }
+    };
+    const busy = busyMap[s.stage] || { title: '', body: '' };
+
+    const cats = ['디지털기기', '생활가전', '가구/인테리어', '생활/주방', '유아동', '의류', '도서', '기타 중고물품'];
+
+    const det = s.current || this.sample();
+    const detail = {
+      title: det.title,
+      category: det.category,
+      desc: det.desc,
+      priceText: det.priceText,
+      photoText: det.photos && det.photos.length > 0 ? '사진 ' + det.photos.length + '장' : '등록된 사진이 없어요',
+      src: imgOf(det.photos),
+      showImg: !!imgOf(det.photos)
+    };
+
+    const showPosts = s.posts.length > 0 && !s.hideList;
+    const posts = s.posts.map((p) => ({ title: p.title, priceText: p.priceText, src: imgOf(p.photos), showImg: !!imgOf(p.photos) }));
+
+    const setField = (key) => (e) => this.setState({ [key]: e.target.value });
+
+    return {
+      accent,
+      successList: list.filter((x) => x.kind === 'ok').map(item),
+      failList: list.filter((x) => x.kind === 'fail').map(item),
+      cur: header,
+      goPrev: () => { if (idx > 0) this.preset(list[idx - 1].id); },
+      goNext: () => { if (idx < list.length - 1) this.preset(list[idx + 1].id); },
+      goStart: () => this.preset('s01'),
+      prevDisabled: idx === 0,
+      nextDisabled: idx === list.length - 1,
+      prevOpacity: idx === 0 ? 0.45 : 1,
+      nextOpacity: idx === list.length - 1 ? 0.45 : 1,
+
+      isSplash: s.screen === 'splash',
+      isHome: s.screen === 'home',
+      isLogin: s.screen === 'login',
+      isCamera: s.screen === 'camera',
+      isWrite: s.screen === 'write',
+      isDetail: s.screen === 'detail',
+      isMine: s.screen === 'mine',
+
+      homeLoading: s.feedLoading,
+      homeError: !s.feedLoading && s.net === 'off',
+      homeReady: !s.feedLoading && s.net !== 'off',
+      skeletons: [{ w: '70%' }, { w: '55%' }, { w: '75%' }, { w: '60%' }, { w: '65%' }],
+      feed: [
+        { title: '접이식 캠핑 의자', price: '15,000원' },
+        { title: '무선 청소기', price: '80,000원' },
+        { title: '원목 책상 스툴', price: '20,000원' },
+        { title: '아기 보행기', price: '10,000원' },
+        { title: '전기 주전자', price: '12,000원' }
+      ],
+      retryHome: () => this.launch(),
+      goHome: () => this.setState({ screen: 'home', sheet: null, popup: null, scenario: s.net === 'off' ? 'e2-1' : 's02' }),
+      goMine: () => this.setState({ screen: 'mine', sheet: null, popup: null, scenario: 's13' }),
+      openDetail: () => this.setState({ screen: 'detail', scenario: 's12' }),
+      openWrite: () => {
+        if (s.account === 'expired') { this.setState({ popup: 'session', scenario: 'e3-1' }); return; }
+        if (s.account === 'banned') { this.setState({ popup: 'restricted', scenario: 'e3-1' }); return; }
+        this.setState({ screen: 'write', scenario: 's03', banner: null, errors: {}, photoError: '' });
+      },
+
+      phone: s.phone,
+      onPhone: setField('phone'),
+      doLogin: () => this.setState({ account: 'ok', screen: 'home', scenario: 's02', phone: '' }),
+
+      closeCamera: () => this.setState({ screen: 'write', scenario: 's04' }),
+      shutter: () => {
+        if (this.state.photos.length >= 10) { this.setState({ screen: 'write', photoError: '사진은 최대 10장까지 첨부할 수 있어요.', scenario: 'e5-1' }); return; }
+        this.addPhoto('촬영한 사진', null);
+      },
+
+      photos: s.photos.map((p, i) => ({
+        n: i + 1,
+        checking: p.status === 'checking',
+        ready: p.status === 'ok',
+        src: p.src,
+        showImg: !!p.src,
+        remove: () => this.setState({ photos: this.state.photos.filter((x) => x.id !== p.id) })
+      })),
+      photoCountText: s.photos.length + '장',
+      photoError: s.photoError,
+      openPhotoSheet: () => this.setState({ sheet: 'photo', scenario: 's04' }),
+      sheetPhoto: s.sheet === 'photo',
+      closeSheet: () => this.setState({ sheet: null }),
+      permOk: s.perm !== 'deny',
+      permDeny: s.perm === 'deny',
+      pickCamera: () => {
+        if (s.perm === 'deny') { this.setState({ sheet: null, popup: 'permission', scenario: 'e4-1' }); return; }
+        this.setState({ sheet: null, screen: 'camera', scenario: 's04' });
+      },
+      albumDenied: () => this.setState({ sheet: null, popup: 'permission', scenario: 'e4-1' }),
+      onFile: (e) => this.onFile(e),
+
+      title: s.title,
+      desc: s.desc,
+      price: s.price,
+      onTitle: (e) => this.setState({ title: e.target.value, errors: Object.assign({}, err, { title: '' }), banner: null }),
+      onDesc: (e) => this.setState({ desc: e.target.value, banner: null }),
+      onPrice: (e) => {
+        const v = e.target.value;
+        const clean = v.replace(/,/g, '').trim();
+        const bad = clean !== '' && !/^\d+$/.test(clean);
+        this.setState({ price: v, errors: Object.assign({}, err, { price: bad ? '가격은 숫자만 입력할 수 있어요.' : '' }), scenario: bad ? 'e8-1' : 's08' });
+      },
+      focusTitle: () => this.setState({ scenario: 's06' }),
+      focusDesc: () => this.setState({ scenario: 's07b' }),
+      focusPrice: () => this.setState({ scenario: 's08' }),
+      titleBorder: err.title ? '#B42318' : '#8A94A0',
+      priceBorder: err.price ? '#B42318' : '#8A94A0',
+      categoryBorder: err.category ? '#B42318' : '#8A94A0',
+      errTitle: err.title || '',
+      errPrice: err.price || '',
+      errCategory: err.category || '',
+
+      categoryLabel: s.category || '카테고리를 선택해 주세요',
+      categoryColor: s.category ? '#1F2328' : '#6B7280',
+      openCategory: () => this.setState({ sheet: 'category', scenario: 's07a' }),
+      sheetCategory: s.sheet === 'category',
+      categories: cats.map((label) => ({
+        label,
+        pick: () => this.setState({ category: label, sheet: null, errors: Object.assign({}, err, { category: '' }), scenario: 's07b' })
+      })),
+
+      bannerBlocked: s.banner === 'blocked',
+      bannerBlockedText: '‘' + s.bannerWord + '’이(가) 포함되어 있어요. 판매 금지 품목이거나 사용할 수 없는 단어예요. 제목과 설명을 수정해 주세요.',
+      bannerNoRedirect: s.banner === 'noRedirect',
+
+      submit: () => this.submit(),
+      submitAria: s.stage ? 'true' : 'false',
+      submitBg: s.stage === 'pressed' ? '#7C2D12' : accent,
+      submitOpacity: s.stage === 'validating' || s.stage === 'saving' ? 0.6 : 1,
+      submitLabel: s.stage === 'validating' || s.stage === 'saving' ? '등록 중…' : '작성 완료',
+
+      detail,
+      myPosts: posts,
+      listHas: showPosts,
+      listMissing: s.posts.length > 0 && s.hideList,
+      listEmpty: s.posts.length === 0,
+      refreshList: () => this.setState({ hideList: false }),
+
+      hasDialog: !!s.popup,
+      dlg,
+      closePopup: () => this.setState({ popup: null }),
+      popupPrimary: () => {
+        const k = this.state.popup;
+        if (k === 'save') this.setState({ popup: null }, () => this.submit());
+        else if (k === 'session') this.setState({ popup: null, screen: 'login' });
+        else this.setState({ popup: null });
+      },
+      hasBusy: s.stage === 'validating' || s.stage === 'saving',
+      busy,
+      hasToast: !!s.toast,
+      toast: s.toast,
+
+      net: s.net,
+      account: s.account,
+      perm: s.perm,
+      banned: s.banned,
+      onNet: setField('net'),
+      onAccount: setField('account'),
+      onPerm: setField('perm'),
+      onBanned: setField('banned'),
+      viewAll: s.viewAll,
+      isSingle: !s.viewAll,
+      showBadge: !s.viewAll,
+      toolbarTitle: s.viewAll ? '전체 화면 (' + list.length + '개)' : cur.label,
+      allLabel: s.viewAll ? '한 화면씩 보기' : '전체 화면 펼쳐 보기',
+      viewAllAria: s.viewAll ? 'true' : 'false',
+      toggleAll: () => this.setState({ viewAll: !this.state.viewAll, settingsOpen: false }),
+      okCards: this.cards(list, cur.id, accent, 'ok'),
+      failCards: this.cards(list, cur.id, accent, 'fail'),
+      settingsOpen: s.settingsOpen,
+      settingsExpanded: s.settingsOpen ? 'true' : 'false',
+      chevRot: s.settingsOpen ? 'rotate(180deg)' : 'none',
+      settingsSummary: '네트워크 ' + (s.net === 'off' ? '끊김' : '정상') + ' · 계정 ' + ({ ok: '정상', expired: '로그인 만료', banned: '이용 제한' }[s.account] || '정상') + ' · 사진 권한 ' + (s.perm === 'deny' ? '거부' : '허용'),
+      toggleSettings: () => this.setState({ settingsOpen: !this.state.settingsOpen })
+    };
+  }
+}
+</script>
+</body>
+</html>

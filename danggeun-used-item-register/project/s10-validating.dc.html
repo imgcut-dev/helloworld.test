@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>10 입력 내용 검증</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="width:390px;height:844px">
+<dc-import name="WriteScreen" photos="2" title-text="접이식 캠핑 의자" category-text="생활/주방" desc-text="작년 여름에 두 번 사용했어요. 접힘 상태 양호하고 수납 가방 포함입니다. 직거래 선호해요." price-text="15,000" submit-state="busy" overlay="validating" hint-size="390px,844px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

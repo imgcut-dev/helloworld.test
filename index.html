@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>이벤트 참가 신청</title>
+<style>
+:root {
+  --bg:#f6f4ef; --surface:#ffffff; --text:#1f2430; --muted:#6b7280; --line:#e3dfd6;
+  --accent:#3b5bdb; --accent-text:#ffffff; --ok:#1f7a4d; --ok-bg:#e6f4ec; --err:#b42318; --err-bg:#fdecea;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#14161b; --surface:#1d2027; --text:#eceef2; --muted:#9aa1ad; --line:#2d313a;
+    --accent:#7c93ff; --accent-text:#10131a; --ok:#6fd3a0; --ok-bg:#16301f; --err:#ff8a80; --err-bg:#3a1c1a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#14161b; --surface:#1d2027; --text:#eceef2; --muted:#9aa1ad; --line:#2d313a;
+  --accent:#7c93ff; --accent-text:#10131a; --ok:#6fd3a0; --ok-bg:#16301f; --err:#ff8a80; --err-bg:#3a1c1a;
+  color-scheme: dark;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+* { box-sizing:border-box; }
+body {
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  line-height:1.6;
+}
+.wrap { max-width:560px; margin:0 auto; padding:32px 20px 56px; }
+.hero { padding:8px 0 24px; }
+.tag { display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; color:var(--accent); background:color-mix(in srgb,var(--accent) 12%,transparent); padding:4px 10px; border-radius:999px; }
+h1 { font-size:28px; line-height:1.3; margin:14px 0 10px; letter-spacing:-.01em; }
+.meta { display:grid; gap:6px; color:var(--muted); font-size:14.5px; margin:0; padding:0; list-style:none; }
+.meta b { color:var(--text); font-weight:600; margin-right:6px; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px; }
+.card + .card { margin-top:16px; }
+h2 { font-size:17px; margin:0 0 16px; }
+label { display:block; font-size:14px; font-weight:600; margin:0 0 6px; }
+label .opt { color:var(--muted); font-weight:400; }
+.req { color:var(--err); font-weight:600; font-size:12px; font-style:normal; margin-left:4px; }
+.field { margin-bottom:16px; }
+input[type=text], input[type=email], input[type=tel], input[type=number], textarea {
+  width:100%; font:inherit; font-size:16px; color:var(--text); background:var(--bg);
+  border:1px solid var(--line); border-radius:10px; padding:11px 12px; outline:none;
+}
+input:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent); }
+textarea { min-height:84px; resize:vertical; }
+.row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:440px) { .row { grid-template-columns:1fr; } }
+.check { display:flex; gap:10px; align-items:flex-start; font-size:14px; font-weight:400; color:var(--muted); }
+.check input { margin-top:4px; width:18px; height:18px; accent-color:var(--accent); flex:none; }
+button { font:inherit; cursor:pointer; }
+.btn { width:100%; border:0; border-radius:12px; background:var(--accent); color:var(--accent-text); font-weight:700; font-size:16px; padding:14px; }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+.btn.ghost { background:transparent; color:var(--text); border:1px solid var(--line); font-weight:600; font-size:14px; padding:10px 14px; width:auto; }
+.btn.small { width:auto; padding:10px 14px; font-size:14px; }
+.notice { border-radius:10px; padding:12px 14px; font-size:14px; margin-top:14px; }
+.notice.ok { background:var(--ok-bg); color:var(--ok); }
+.notice.err { background:var(--err-bg); color:var(--err); }
+.notice.info { background:var(--bg); color:var(--muted); border:1px solid var(--line); }
+.done h2 { color:var(--ok); }
+.done dl { display:grid; grid-template-columns:90px 1fr; gap:6px 12px; margin:0 0 16px; font-size:14.5px; }
+.done dt { color:var(--muted); }
+.done dd { margin:0; word-break:break-all; }
+.actions { display:flex; gap:8px; flex-wrap:wrap; }
+.admin-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+.admin-head h2 { margin:0; }
+.count { font-variant-numeric:tabular-nums; color:var(--muted); font-size:14px; }
+.tablebox { overflow-x:auto; border:1px solid var(--line); border-radius:10px; }
+table { border-collapse:collapse; width:100%; font-size:13.5px; min-width:520px; }
+th, td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+td.note { white-space:normal; min-width:140px; }
+th { color:var(--muted); font-weight:600; background:var(--bg); }
+tr:last-child td { border-bottom:0; }
+.hidden { display:none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <span class="tag">참가 신청</span>
+    <h1>이벤트 이름을 입력하세요</h1>
+    <ul class="meta">
+      <li><b>일시</b>0000년 00월 00일 (요일) 00:00</li>
+      <li><b>장소</b>장소 또는 온라인 링크 안내</li>
+      <li><b>대상</b>참가 대상 안내</li>
+    </ul>
+  </header>
+
+  <section class="card" id="formCard">
+    <h2>신청 정보</h2>
+    <div id="formBox">
+      <div class="field">
+        <label for="name">이름 <span class="req">(*필수)</span></label>
+        <input id="name" type="text" maxlength="30" autocomplete="name" placeholder="한글 또는 영문, 공백 없이 (예: 홍길동, GildongHong)">
+      </div>
+      <div class="field">
+        <label for="email">이메일 <span class="req">(*필수)</span></label>
+        <input id="email" type="email" maxlength="120" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="영문 이메일 (name@example.com)">
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="company">회사명·소속 <span class="req">(*필수)</span></label>
+          <input id="company" type="text" maxlength="80" autocomplete="organization" placeholder="회사명 또는 학교·기관명">
+        </div>
+        <div class="field">
+          <label for="position">직급·직책 <span class="req">(*필수)</span></label>
+          <input id="position" type="text" maxlength="40" autocomplete="organization-title" placeholder="예: 매니저, 학생">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="phone">연락처 <span class="opt">(선택)</span></label>
+          <input id="phone" type="tel" maxlength="13" autocomplete="tel" inputmode="numeric" placeholder="숫자만 입력 (- 자동 입력)">
+        </div>
+        <div class="field">
+          <label for="count">참석 인원 <span class="req">(*필수)</span></label>
+          <input id="count" type="number" min="1" max="10" value="1" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field">
+        <label for="note">남기실 말씀 <span class="opt">(선택)</span></label>
+        <textarea id="note" maxlength="500" placeholder="한글·영문으로 입력해 주세요"></textarea>
+        <div id="noteCount" style="text-align:right;font-size:12.5px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums">0/500</div>
+      </div>
+      <div class="field">
+        <div style="font-size:14px;font-weight:600;margin:0 0 8px">개인정보 동의 및 파기</div>
+        <label class="check"><input id="consent" type="checkbox"><span>행사 운영 안내를 위해 이름·이메일·연락처를 수집하고 이벤트 종료 후 파기하는 데 동의합니다. <span class="req">(*필수)</span></span></label>
+      </div>
+      <button class="btn" id="submitBtn" disabled>신청하기</button>
+      <div id="msg" class="notice info" aria-live="polite">신청 저장소에 연결하는 중입니다…</div>
+    </div>
+
+    <div id="doneBox" class="done hidden">
+      <h2>신청이 접수되었습니다</h2>
+      <dl id="doneList"></dl>
+      <div class="actions">
+        <button class="btn ghost" id="editBtn">내용 수정</button>
+        <button class="btn ghost" id="cancelBtn">신청 취소</button>
+      </div>
+      <div id="doneMsg" class="notice info hidden" aria-live="polite"></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var db = null, myId = null, myDoc = null, current = null, rows = [];
+
+  function setMsg(el, text, kind) {
+    el.textContent = text;
+    el.className = 'notice ' + kind;
+    el.classList.toggle('hidden', !text);
+  }
+  function fmt(ts) {
+    var d = new Date(ts);
+    return isNaN(d) ? '' : d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + String(d.getDate()).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+  function validate() {
+    var name = $('name').value.trim(), email = $('email').value.trim();
+    var n = parseInt($('count').value, 10);
+    if (!name) return '이름을 입력해 주세요.';
+    if (!/^[가-힣A-Za-z]{2,30}$/.test(name)) return '이름은 공백 없이 한글 또는 영문 2자 이상으로 입력해 주세요.';
+    if (!/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}$/.test(email)) return '이메일은 영문 이메일 형식(name@example.com)으로 입력해 주세요.';
+    if (!$('company').value.trim()) return '회사명·소속을 입력해 주세요.';
+    if (!$('position').value.trim()) return '직급·직책을 입력해 주세요.';
+    var phone = $('phone').value.trim();
+    if (phone && !/^\d{2,3}-\d{3,4}-\d{4}$/.test(phone)) return '연락처는 숫자와 - 형식(예: 010-1234-5678)으로 입력해 주세요.';
+    if (!(n >= 1 && n <= 10)) return '참석 인원은 1~10명 사이로 입력해 주세요.';
+    if (!$('consent').checked) return '__CONSENT__';
+    return '';
+  }
+  function updateButton() {
+    $('submitBtn').disabled = !(db && myDoc);
+  }
+  function showDone(data) {
+    var dl = $('doneList');
+    dl.textContent = '';
+    [['이름', data.name], ['이메일', data.email], ['회사·소속', data.company || '-'], ['직급', data.position || '-'], ['연락처', data.phone || '-'], ['인원', data.count + '명'], ['접수', fmt(data.createdAt)]].forEach(function (p) {
+      var dt = document.createElement('dt'); dt.textContent = p[0];
+      var dd = document.createElement('dd'); dd.textContent = p[1];
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    $('formBox').classList.add('hidden');
+    $('doneBox').classList.remove('hidden');
+  }
+  function showForm() {
+    $('doneBox').classList.add('hidden');
+    $('formBox').classList.remove('hidden');
+    if (current) {
+      $('name').value = current.name || '';
+      $('email').value = current.email || '';
+      $('company').value = current.company || '';
+      $('position').value = current.position || '';
+      $('phone').value = current.phone || '';
+      $('count').value = current.count || 1;
+      $('note').value = current.note || '';
+      $('note').dispatchEvent(new Event('input'));
+      $('consent').checked = true;
+    }
+  }
+
+  $('submitBtn').addEventListener('click', async function () {
+    var err = validate();
+    if (err === '__CONSENT__') {
+      var cmsg = '개인정보 동의 및 파기는 필수 입니다.';
+      setMsg($('msg'), cmsg, 'err');
+      alert(cmsg);
+      return;
+    }
+    if (err) { setMsg($('msg'), err, 'err'); return; }
+    if (!myDoc) return;
+    var data = {
+      name: $('name').value.trim(),
+      email: $('email').value.trim(),
+      company: $('company').value.trim(),
+      position: $('position').value.trim(),
+      phone: $('phone').value.trim(),
+      count: parseInt($('count').value, 10),
+      note: $('note').value.trim(),
+      createdAt: current && current.createdAt ? current.createdAt : Date.now(),
+      updatedAt: Date.now()
+    };
+    $('submitBtn').disabled = true;
+    setMsg($('msg'), '저장하는 중입니다…', 'info');
+    try {
+      await myDoc.set(data);
+      current = data;
+      setMsg($('msg'), '', 'info');
+      showDone(data);
+    } catch (e) {
+      setMsg($('msg'), '신청을 저장하지 못했습니다. 로그인 상태와 접근 권한을 확인한 뒤 다시 시도해 주세요.', 'err');
+    } finally {
+      updateButton();
+    }
+  });
+
+  $('editBtn').addEventListener('click', showForm);
+
+  $('cancelBtn').addEventListener('click', async function () {
+    if (!myDoc || !confirm('신청을 취소할까요?')) return;
+    try {
+      await myDoc.delete();
+      current = null;
+      $('name').value = ''; $('email').value = ''; $('company').value = ''; $('position').value = ''; $('phone').value = ''; $('count').value = 1; $('note').value = ''; $('note').dispatchEvent(new Event('input')); $('consent').checked = false;
+      $('doneBox').classList.add('hidden');
+      $('formBox').classList.remove('hidden');
+      setMsg($('msg'), '신청이 취소되었습니다.', 'ok');
+    } catch (e) {
+      setMsg($('doneMsg'), '취소하지 못했습니다. 잠시 후 다시 시도해 주세요.', 'err');
+    }
+  });
+
+  function bindFilter(el, re, after) {
+    var composing = false;
+    function clean() {
+      var v = el.value.replace(re, '');
+      if (v !== el.value) el.value = v;
+      if (after) after(el);
+    }
+    el.addEventListener('compositionstart', function () { composing = true; });
+    el.addEventListener('compositionend', function () { composing = false; clean(); });
+    el.addEventListener('input', function () {
+      if (composing) { if (after) after(el); } else { clean(); }
+    });
+  }
+  function updateNoteCount(el) { $('noteCount').textContent = el.value.length + '/500'; }
+
+  bindFilter($('name'), /[^가-힣A-Za-z]/g);
+  bindFilter($('email'), /[^A-Za-z0-9._%+\-@]/g);
+  bindFilter($('note'), /[^\u0020-\u007E\n\r\t가-힣ㄱ-ㅎㅏ-ㅣ\u2018\u2019\u201C\u201D\u00B7\u2026]/g, updateNoteCount);
+
+  $('phone').addEventListener('input', function () {
+    var d = this.value.replace(/\D/g, '');
+    var a = d.indexOf('02') === 0 ? 2 : 3;
+    d = d.slice(0, a === 2 ? 10 : 11);
+    var out = d;
+    if (d.length > a) out = d.slice(0, a) + '-' + d.slice(a);
+    if (d.length > a + 4) out = d.slice(0, a) + '-' + d.slice(a, a + 4) + '-' + d.slice(a + 4);
+    this.value = out;
+  });
+
+  var cnt = $('count');
+  cnt.addEventListener('keydown', function (e) {
+    if (['e', 'E', '+', '-', '.'].indexOf(e.key) >= 0) e.preventDefault();
+  });
+  cnt.addEventListener('input', function () {
+    var n = parseInt(cnt.value, 10);
+    if (n > 10) cnt.value = 10;
+    if (n < 1) cnt.value = 1;
+  });
+  cnt.addEventListener('blur', function () {
+    if (!cnt.value || parseInt(cnt.value, 10) < 1) cnt.value = 1;
+  });
+
+  async function init() {
+    try {
+      var results = await Promise.all([claude.use('db'), claude.use('user')]);
+      db = results[0];
+      var user = results[1];
+      if (!db || !user) {
+        setMsg($('msg'), '이 화면에서는 신청 저장소를 사용할 수 없습니다. 로그인 후 링크를 다시 열어 주세요.', 'err');
+        return;
+      }
+      myId = await user.id();
+      myDoc = db.doc('registrations/' + myId);
+      updateButton();
+      setMsg($('msg'), '', 'info');
+
+      var loadTimer = setTimeout(function () {
+        setMsg($('msg'), '저장소에 아직 연결되지 않았습니다. 잠시 후에도 같으면 새로고침해 주세요.', 'info');
+      }, 10000);
+      myDoc.onSnapshot(function (snap) {
+        clearTimeout(loadTimer);
+        if (snap.exists) {
+          current = snap.data();
+          showDone(current);
+        }
+      }, function () { clearTimeout(loadTimer); });
+
+    } catch (e) {
+      setMsg($('msg'), '저장소에 연결하지 못했습니다.', 'err');
+    }
+  }
+  init();
+})();
+</script>
+</body>
+</html>
